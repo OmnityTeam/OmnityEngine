@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <BaseOutputPath>$(SolutionDir)Binary\Managed</BaseOutputPath>
+    <Platforms>AnyCPU;x64;x86</Platforms>
+    <Configurations>Debug;Release</Configurations>
+	<TargetFramework>net7.0-windows</TargetFramework>
+  </PropertyGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\OmnityEngine.Core\OmnityEngine.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="$(SolutionDir)Binary/win-$(Platform)/$(Configuration)/OmnityNative.dll">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <Target Name="BuildNative" BeforeTargets="CopyFilesToOutputDirectory">
+    <Message Text="BuildNative" Importance="high" />
+	<MSBuild Projects="..\OmnityNative.Windows\OmnityNative.Windows.vcxproj" />
+  </Target>
+
+</Project>

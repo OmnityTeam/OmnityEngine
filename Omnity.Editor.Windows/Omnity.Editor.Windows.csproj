@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BaseOutputPath>$(SolutionDir)Binary\Managed</BaseOutputPath>
+    <Platforms>AnyCPU;x64;x86</Platforms>
+    <Configurations>Debug;Release</Configurations>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OmnityEngine.Core\OmnityEngine.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Configuration)'=='Debug'">
+    <Content Include="$(SolutionDir)Binary/win-$(Platform)/OmnityNatived.dll">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Configuration)'=='Release'">
+    <Content Include="$(SolutionDir)Binary/win-$(Platform)/OmnityNative.dll">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <Target Name="BuildNative" BeforeTargets="BeforeBuild">
+    <Message Text="BuildNative" Importance="high" />
+	<MSBuild Projects="..\OmnityNative.Windows\OmnityNative.Windows.vcxproj" />
+  </Target>
+
+</Project>

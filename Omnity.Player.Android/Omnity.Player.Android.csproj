@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0-android</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<Platforms>AnyCPU</Platforms>
+	<Configurations>Debug;Release</Configurations>
+	<RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
+	<SupportedOSPlatformVersion>21.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <ProjectReference Include="..\OmnityEngine.Core\OmnityEngine.Core.csproj" />
+  </ItemGroup>
+
+  <Target Name="BuildNative" BeforeTargets="BeforeBuild">
+    <Message Text="BuildNative" Importance="high" />
+	<MSBuild Projects="..\OmnityNative.Android\OmnityNative.Android.vcxproj" Properties="Platform=ARM" />
+	<MSBuild Projects="..\OmnityNative.Android\OmnityNative.Android.vcxproj" Properties="Platform=ARM64" />
+	<MSBuild Projects="..\OmnityNative.Android\OmnityNative.Android.vcxproj" Properties="Platform=x86" />
+	<MSBuild Projects="..\OmnityNative.Android\OmnityNative.Android.vcxproj" Properties="Platform=x64" />
+  </Target>
+	
+  <ItemGroup Condition="'$(Configuration)'=='Release'">
+	<AndroidNativeLibrary Include="$(SolutionDir)Binary/android-x86/$(Configuration)/libOmnityNative.so">
+      <Abi>x86</Abi>
+    </AndroidNativeLibrary>
+    <AndroidNativeLibrary Include="$(SolutionDir)Binary/android-x64/$(Configuration)/libOmnityNative.so">
+      <Abi>x86_64</Abi>
+    </AndroidNativeLibrary>
+	<AndroidNativeLibrary Include="$(SolutionDir)Binary/android-ARM32/$(Configuration)/libOmnityNative.so">
+      <Abi>armeabi-v7a</Abi>
+    </AndroidNativeLibrary>
+	<AndroidNativeLibrary Include="$(SolutionDir)Binary/android-ARM64/$(Configuration)/libOmnityNative.so">
+      <Abi>arm64-v8a</Abi>
+    </AndroidNativeLibrary>
+  </ItemGroup>
+	
+</Project>
