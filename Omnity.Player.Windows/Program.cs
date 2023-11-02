@@ -1,10 +1,13 @@
 ﻿using OmnityEngine.Core;
+using OmnityEngine.Core.Graphic;
 using OmnityEngine.Core.Native;
 
 void run()
 {
-    var app = new Application();
-    var buffer = app.Graphic.CreateBuffer();
+    using var app = new Application(new ApplicationInfo
+    {
+        graphicApi = GraphicApi.Vulkan
+    });
     //buffer.Dispose();
     //app.Dispose();
 }

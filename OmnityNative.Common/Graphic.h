@@ -1,6 +1,11 @@
 #pragma once
 #include "OmnityApi.h"
 
+/***********************************/
+// 
+// Define OMNITY_USE_VULKAN if vulkan is supported in current platform
+//
+/***********************************/
 OMNITY_BEGIN
 
 enum GraphicApi
@@ -9,55 +14,78 @@ enum GraphicApi
 	Directx = 1
 };
 
-class Buffer;
-class Texture;
-class Texture2D;
-class RenderTarget;
-class Shader;
-class RenderPipeline;
-class Descriptor;
+class IGpuDevice;
+class IBuffer;
+class ITexture;
+class ITexture2D;
+class IRenderTarget;
+class IShader;
+class IRenderPipeline;
+class IDescriptor;
 
-class Graphic : public OmnityObject
+class GraphicHost : public OmnityObject
 {
+private:
+	ObjectRef<IGpuDevice> _device;
+
 public:
-	Graphic(GraphicApi api);
-	ObjectRef<Buffer> CreateBuffer();
+	GraphicHost(GraphicApi api);
 };
 
-class Buffer : public OmnityObject
+class IGpuDevice : public OmnityObject
 {
-public:
-	void test() {}
+protected:
+	IGpuDevice() {}
+	~IGpuDevice() {}
 };
 
-class Texture : public OmnityObject
-{
-
-};
-
-class Texture2D : public Texture
+class IBuffer : public OmnityObject
 {
 
 };
 
-class RenderTarget : public OmnityObject
+class ITexture : public OmnityObject
 {
 
 };
 
-class Shader : public OmnityObject
+class ITexture2D : public ITexture
 {
 
 };
 
-class RenderPipeline : public OmnityObject
+class IRenderTarget : public OmnityObject
 {
 
 };
 
-class Descriptor : public OmnityObject
+class IShader : public OmnityObject
+{
+
+};
+
+class IRenderPipeline : public OmnityObject
+{
+
+};
+
+class IDescriptor : public OmnityObject
 {
 
 };
 
 OMNITY_END
+
+
+#ifdef OMNITY_USE_VULKAN
+#include <vulkan/vulkan.hpp>
+OMNITY_BEGIN
+class VkGpuDevice : IGpuDevice
+{
+	vk::Instance _instance;
+public:
+	VkGpuDevice();
+	~VkGpuDevice();
+};
+OMNITY_END
+#endif

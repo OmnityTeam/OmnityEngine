@@ -1,4 +1,5 @@
-﻿using OmnityEngine.Core.Native;
+﻿using OmnityEngine.Core.Graphic;
+using OmnityEngine.Core.Native;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,40 +18,40 @@ namespace OmnityEngine.Core
         Unknown = 999
     }
 
-    public partial class Application : NativeObject<Application>
+    public partial class Application : IDisposable
     {
-        [LibraryImport("OmnityNative", EntryPoint = "Application__Ctor")]
-        private static partial NativePointer<Application> Ctor();
-        public Application() : base(Ctor())
-        {
-            Graphic = new(GraphicApi.Vulkan);
-        }
-
-
         [LibraryImport("OmnityNative", EntryPoint = "Application__GetEngineVersion")]
-        private static partial ulong GetEngineVersion(NativePointer<Application> _this);
-        public ulong EngineVersion => GetEngineVersion(this);
+        private static partial ulong GetEngineVersion();
+        public static ulong EngineVersion => GetEngineVersion();
 
 
         [LibraryImport("OmnityNative", EntryPoint = "Application__GetPlatformId")]
-        private static partial ushort GetPlatformId(NativePointer<Application> _this);
-        public ushort PlatformId => GetPlatformId(this);
-
-
-        public Graphic Graphic { get; }
-
-        public override void Dispose()
-        {
-            Graphic.Dispose();
-            base.Dispose();
-        }
-
-        public PlatformName Platform => PlatformId switch
+        private static partial ushort GetPlatformId();
+        public static ushort PlatformId => GetPlatformId();
+        public static PlatformName Platform => PlatformId switch
         {
             1 => PlatformName.Windows,
             2 => PlatformName.Android,
             3 => PlatformName.iOS,
             _ => PlatformName.Unknown
         };
+
+        public GraphicHost GraphicHost { get; }
+        public ApplicationInfo Info { get; }
+        public Application(ApplicationInfo appInfo)
+        {
+            Info = appInfo;
+            GraphicHost = new GraphicHost(Info.graphicApi);
+        }
+
+        public void Dispose()
+        {
+            GraphicHost.Dispose();
+        }
+    }
+
+    public struct ApplicationInfo
+    {
+        public GraphicApi graphicApi;
     }
 }

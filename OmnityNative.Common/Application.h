@@ -8,10 +8,10 @@ class Graphic;
 class Application : OmnityObject
 {
 public:
-	UShort GetPlatformId();
-	ULong GetEngineVersion();
+	static UShort GetPlatformId();
+	static ULong GetEngineVersion();
 
-	Application();
+	Application() = delete;
 
 	virtual ~Application()
 	{

@@ -14,26 +14,14 @@ UShort Application::GetPlatformId()
 	return OMNITY_PLATFORM_ID;
 }
 
-Application::Application()
-{
-
-}
-
 OMNITY_END
 
-OMNITY_API_EXPORT OMNITY_API_CTOR(Application)
+OMNITY_API_EXPORT OMNITY_NAMESPACE::ULong OMNITY_API_STATIC_METHOD(Application, GetEngineVersion)
 {
-	return OMNITY_API_CTOR_CREATE_OBJECT(Application);
+	return OMNITY_NAMESPACE::Application::GetEngineVersion();
 }
 
-OMNITY_API_EXPORT OMNITY_NAMESPACE::ULong OMNITY_API_METHOD(Application, GetEngineVersion)
+OMNITY_API_EXPORT OMNITY_NAMESPACE::UShort OMNITY_API_STATIC_METHOD(Application, GetPlatformId)
 {
-	OMNITY_DEFINE_THIS(Application);
-	return This->GetEngineVersion();
-}
-
-OMNITY_API_EXPORT OMNITY_NAMESPACE::UShort OMNITY_API_METHOD(Application, GetPlatformId)
-{
-	OMNITY_DEFINE_THIS(Application);
-	return This->GetPlatformId();
+	return OMNITY_NAMESPACE::Application::GetPlatformId();
 }
