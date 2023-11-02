@@ -20,7 +20,7 @@ namespace OmnityEngine.Core
     public partial class Application : NativeObject<Application>
     {
         [LibraryImport("OmnityNative", EntryPoint = "Application__Ctor")]
-        internal static partial NativeHandle<Application> Ctor();
+        private static partial NativeHandle<Application> Ctor();
 
         [LibraryImport("OmnityNative", EntryPoint = "Application__Init")]
         [return: MarshalAs(UnmanagedType.Bool)]
