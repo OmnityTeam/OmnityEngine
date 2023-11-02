@@ -20,7 +20,7 @@ class Descriptor;
 class Graphic : public OmnityObject
 {
 public:
-	Bool Init(GraphicApi api);
+	Graphic(GraphicApi api);
 	ObjectRef<Buffer> CreateBuffer();
 };
 

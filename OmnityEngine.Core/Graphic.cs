@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OmnityEngine.Core
 {
-    enum GraphicApi
+    public enum GraphicApi
     {
         Vulkan = 0,
         Directx = 1
@@ -17,24 +17,18 @@ namespace OmnityEngine.Core
 
     public partial class Graphic : NativeObject<Graphic>
     {
+        [LibraryImport("OmnityNative", EntryPoint = "Graphic__Ctor")]
+        private static partial NativePointer<Graphic> Ctor(GraphicApi api);
+        public Graphic(GraphicApi api) : base(Ctor(api)) { }
 
-        [LibraryImport("OmnityNative", EntryPoint = "Graphic__Init")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static partial bool Init(NativeHandle<Graphic> handle, GraphicApi api);
 
         [LibraryImport("OmnityNative", EntryPoint = "Graphic__CreateBuffer")]
-        private static partial NativeHandle<Buffer> CreateBuffer(NativeHandle<Graphic> handle);
-
-        internal Graphic(NativeHandle<Graphic> handle) : base(handle) { }
-
-        public Buffer CreateBuffer()
-        {
-            return new Buffer(CreateBuffer(Handle));
-        }
+        private static partial NativePointer<Buffer> CreateBuffer(NativePointer<Graphic> _this);
+        public Buffer CreateBuffer() => new(CreateBuffer(this));
     }
 
     public class Buffer : NativeObject<Buffer>
     {
-        internal Buffer(NativeHandle<Buffer> handle) : base(handle) { }
+        internal Buffer(NativePointer<Buffer> handle) : base(handle) { }
     }
 }

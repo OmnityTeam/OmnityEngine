@@ -9,6 +9,6 @@ void run()
     //app.Dispose();
 }
 run();
-GC.Collect();
-GC.WaitForPendingFinalizers();
+//GC.Collect();
+//GC.WaitForPendingFinalizers();
 return 0;

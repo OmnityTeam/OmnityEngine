@@ -1,10 +1,11 @@
 #include "Graphic.h"
+#include "Graphic.h"
 
 OMNITY_BEGIN
 
-Bool Graphic::Init(GraphicApi api)
+Graphic::Graphic(GraphicApi api)
 {
-	return true;
+
 }
 
 ObjectRef<Buffer> Graphic::CreateBuffer()

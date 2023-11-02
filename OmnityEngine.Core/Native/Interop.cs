@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
+using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using System.Text;
@@ -10,42 +12,71 @@ using System.Threading.Tasks;
 
 namespace OmnityEngine.Core.Native
 {
-    internal static partial class NativeHandleCalls
+    [CustomMarshaller(typeof(NativePointer<>), MarshalMode.Default, typeof(NativeSharedPointerMarshaller<>))]
+    internal static class NativeSharedPointerMarshaller<T> where T : NativeObject<T>
+    {
+        public static IntPtr ConvertToUnmanaged(NativePointer<T> managed)
+            => managed.Pointer;
+
+        public static NativePointer<T> ConvertToManaged(IntPtr unmanaged)
+            => new(unmanaged);
+    }
+
+    internal partial class NativePointer : CriticalFinalizerObject, IDisposable
     {
         [LibraryImport("OmnityNative", EntryPoint = "ObjectRefState__DangerousRelease")]
-        internal static partial void Delete(IntPtr ptr);
+        internal static partial void Release(IntPtr ptr);
 
         [LibraryImport("OmnityNative", EntryPoint = "ObjectRefState__GetRefCount")]
         internal static partial uint GetNativeRefCount(IntPtr ptr);
-    }
 
-    internal partial class NativeHandle<T> : SafeHandle where T : NativeObject<T>
-    {
-        public static NativeHandle<T> Invalid = new NativeHandle<T>();
-        public override bool IsInvalid => handle == 0;
+        internal IntPtr Pointer { get; private set; }
 
-        public NativeHandle() : base(0, true) { }
-
-        protected override bool ReleaseHandle()
+        internal NativePointer(IntPtr pointer)
         {
-            NativeHandleCalls.Delete(handle);
-            handle = 0;
-            return true;
+            Pointer = pointer;
+        }
+
+        public void Dispose()
+        {
+            if (Pointer != IntPtr.Zero) Release();
+            GC.SuppressFinalize(this);
+        }
+
+        ~NativePointer()
+        {
+            Release();
+        }
+
+        private void Release()
+        {
+            Release(Pointer);
+            Pointer = IntPtr.Zero;
         }
     }
 
-    public abstract partial class NativeObject<T> : IDisposable where T : NativeObject<T>
+    [NativeMarshalling(typeof(NativeSharedPointerMarshaller<>))]
+    internal partial class NativePointer<T> : NativePointer where T : NativeObject<T>
     {
-        internal NativeHandle<T> Handle { get; } = NativeHandle<T>.Invalid;
+        internal NativePointer(IntPtr pointer) : base(pointer) { }
 
-        internal NativeObject(NativeHandle<T> handle)
+        public static implicit operator NativePointer<T>(NativeObject<T> obj)
         {
-            Handle = handle;
+            return obj.SharedPtr;
         }
+    }
 
+    public abstract class NativeObject<T> where T : NativeObject<T>
+    {
+        internal NativePointer<T> SharedPtr { get; }
+        internal NativeObject(NativePointer<T> sharedPtr)
+        {
+            SharedPtr = sharedPtr;
+        }
         public virtual void Dispose()
         {
-            Handle.Dispose();
+            SharedPtr.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

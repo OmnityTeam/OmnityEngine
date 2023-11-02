@@ -20,25 +20,24 @@ namespace OmnityEngine.Core
     public partial class Application : NativeObject<Application>
     {
         [LibraryImport("OmnityNative", EntryPoint = "Application__Ctor")]
-        private static partial NativeHandle<Application> Ctor();
-
-        [LibraryImport("OmnityNative", EntryPoint = "Application__Init")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static partial bool Init(NativeHandle<Application> handle);
-
-        [LibraryImport("OmnityNative", EntryPoint = "Application__GetEngineVersion")]
-        private static partial ulong GetEngineVersion(NativeHandle<Application> handle);
-
-        [LibraryImport("OmnityNative", EntryPoint = "Application__GetPlatformId")]
-        private static partial ushort GetPlatformId(NativeHandle<Application> handle);
-
-        [LibraryImport("OmnityNative", EntryPoint = "Application__GetGraphic")]
-        private static partial NativeHandle<Graphic> GetGraphic(NativeHandle<Application> handle);
-        
+        private static partial NativePointer<Application> Ctor();
         public Application() : base(Ctor())
         {
-            Graphic = new(GetGraphic(Handle));
+            Graphic = new(GraphicApi.Vulkan);
         }
+
+
+        [LibraryImport("OmnityNative", EntryPoint = "Application__GetEngineVersion")]
+        private static partial ulong GetEngineVersion(NativePointer<Application> _this);
+        public ulong EngineVersion => GetEngineVersion(this);
+
+
+        [LibraryImport("OmnityNative", EntryPoint = "Application__GetPlatformId")]
+        private static partial ushort GetPlatformId(NativePointer<Application> _this);
+        public ushort PlatformId => GetPlatformId(this);
+
+
+        public Graphic Graphic { get; }
 
         public override void Dispose()
         {
@@ -46,9 +45,7 @@ namespace OmnityEngine.Core
             base.Dispose();
         }
 
-        public Graphic Graphic { get; }
-
-        public PlatformName Platform => GetPlatformId(Handle) switch
+        public PlatformName Platform => PlatformId switch
         {
             1 => PlatformName.Windows,
             2 => PlatformName.Android,
