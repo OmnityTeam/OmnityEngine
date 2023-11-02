@@ -122,8 +122,7 @@ public:
 	static void DangerousRelease(CObjectRef ref)
 	{
 		if (ref == nullptr) return;
-		--ref->count;
-		if (ref->count == 0)
+		if (--ref->count == 0)
 			Dispose(ref);
 	}
 private:
