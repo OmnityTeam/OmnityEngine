@@ -18,7 +18,7 @@ namespace OmnityEngine.Core
     public partial class Graphic : NativeObject<Graphic>
     {
         [LibraryImport("OmnityNative", EntryPoint = "Graphic__Ctor")]
-        internal static partial NativeHandle<Graphic> Ctor();
+        private static partial NativeHandle<Graphic> Ctor();
 
         [LibraryImport("OmnityNative", EntryPoint = "Graphic__Init")]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -37,6 +37,6 @@ namespace OmnityEngine.Core
 
     public class Buffer : NativeObject<Buffer>
     {
-        public Buffer(NativeHandle<Buffer> handle) : base(handle) { }
+        internal Buffer(NativeHandle<Buffer> handle) : base(handle) { }
     }
 }
