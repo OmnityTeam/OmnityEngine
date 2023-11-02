@@ -95,7 +95,7 @@ public:
 	}
 	ObjectRef operator=(const ObjectRef& r)
 	{
-		if (r._refInfo == _refInfo) return;
+		if (r._refInfo == _refInfo) return *this;
 		DangerousRelease();
 		_refInfo = r._refInfo;
 		DangerousAddRef();

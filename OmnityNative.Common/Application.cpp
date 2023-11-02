@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "OmnityApi.h"
+#include "Graphic.h"
 
 OMNITY_BEGIN
 
@@ -16,6 +17,11 @@ ULong Application::GetEngineVersion()
 UShort Application::GetPlatformId()
 {
 	return OMNITY_PLATFORM_ID;
+}
+
+Application::Application()
+{
+	graphic = ObjectRef(new Graphic());
 }
 
 OMNITY_END
@@ -41,4 +47,10 @@ OMNITY_API_EXPORT OMNITY_NAMESPACE::UShort OMNITY_API_METHOD(Application, GetPla
 {
 	OMNITY_DEFINE_THIS(Application);
 	return This->GetPlatformId();
+}
+
+OMNITY_API_EXPORT OMNITY_NAMESPACE::CObjectRef OMNITY_API_METHOD(Application, GetGraphic)
+{
+	OMNITY_DEFINE_THIS(Application);
+	return This->graphic.RequireManagedRef();
 }

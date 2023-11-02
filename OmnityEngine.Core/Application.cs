@@ -32,9 +32,12 @@ namespace OmnityEngine.Core
         [LibraryImport("OmnityNative", EntryPoint = "Application__GetPlatformId")]
         private static partial ushort GetPlatformId(NativeHandle<Application> handle);
 
+        [LibraryImport("OmnityNative", EntryPoint = "Application__GetGraphic")]
+        private static partial NativeHandle<Graphic> GetGraphic(NativeHandle<Application> handle);
+        
         public Application() : base(Ctor())
         {
-            Graphic = new();
+            Graphic = new(GetGraphic(Handle));
         }
 
         public override void Dispose()
