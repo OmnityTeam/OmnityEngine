@@ -27,13 +27,16 @@ namespace OmnityEngine.Core
         [LibraryImport("OmnityNative", EntryPoint = "Graphic__CreateBuffer")]
         private static partial NativeHandle<Buffer> CreateBuffer(NativeHandle<Graphic> handle);
 
+        public Graphic() : base(Ctor()) { }
+
         public Buffer CreateBuffer()
         {
-            return Buffer.CreateInstanceFrom(CreateBuffer(Handle));
+            return new Buffer(CreateBuffer(Handle));
         }
     }
 
     public class Buffer : NativeObject<Buffer>
     {
+        public Buffer(NativeHandle<Buffer> handle) : base(handle) { }
     }
 }

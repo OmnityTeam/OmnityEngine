@@ -3,7 +3,7 @@ using OmnityEngine.Core.Native;
 
 void run()
 {
-    var app = Application.CreateInstance();
+    var app = new Application();
     var buffer = app.Graphic.CreateBuffer();
     //buffer.Dispose();
     //app.Dispose();

@@ -19,7 +19,7 @@ namespace OmnityEngine.Core.Native
         internal static partial uint GetNativeRefCount(IntPtr ptr);
     }
 
-    public partial class NativeHandle<T> : SafeHandle where T : NativeObject<T>, new()
+    public partial class NativeHandle<T> : SafeHandle where T : NativeObject<T>
     {
         public static NativeHandle<T> Invalid = new NativeHandle<T>();
         public override bool IsInvalid => handle == 0;
@@ -34,23 +34,18 @@ namespace OmnityEngine.Core.Native
         }
     }
 
-    public abstract partial class NativeObject<T> : IDisposable where T : NativeObject<T>, new()
+    public abstract partial class NativeObject<T> : IDisposable where T : NativeObject<T>
     {
-        internal NativeHandle<T> Handle { get; private set; } = NativeHandle<T>.Invalid;
+        internal NativeHandle<T> Handle { get; } = NativeHandle<T>.Invalid;
 
-        protected NativeObject()
+        protected NativeObject(NativeHandle<T> handle)
         {
+            Handle = handle;
         }
 
         public virtual void Dispose()
         {
             Handle.Dispose();
         }
-
-        public static T CreateInstanceFrom(NativeHandle<T> handle) =>
-            new T
-            {
-                Handle = handle
-            };
     }
 }

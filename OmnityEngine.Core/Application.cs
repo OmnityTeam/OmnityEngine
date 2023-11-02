@@ -32,14 +32,9 @@ namespace OmnityEngine.Core
         [LibraryImport("OmnityNative", EntryPoint = "Application__GetPlatformId")]
         private static partial ushort GetPlatformId(NativeHandle<Application> handle);
 
-        public static Application CreateInstance()
+        public Application() : base(Ctor())
         {
-            return CreateInstanceFrom(Ctor());
-        }
-
-        public Application()
-        {
-            Graphic = Graphic.CreateInstanceFrom(Graphic.Ctor());
+            Graphic = new();
         }
 
         public override void Dispose()
