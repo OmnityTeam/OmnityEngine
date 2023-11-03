@@ -34,17 +34,31 @@ public:
 
 class IGpuDevice : public OmnityObject
 {
+public:
+	virtual ObjectRef<IBuffer> CreateBuffer(int size) = 0;
+
 protected:
 	IGpuDevice() {}
 	~IGpuDevice() {}
 };
 
-class IBuffer : public OmnityObject
+class GpuResource : public OmnityObject
 {
-
+private:
+	ObjectRef<IGpuDevice> _owner;
 };
 
-class ITexture : public OmnityObject
+class IBuffer : public GpuResource
+{
+public:
+	virtual void CopyTo(ObjectRef<IBuffer> dest) = 0;
+
+protected:
+	IBuffer() {}
+	~IBuffer() {}
+};
+
+class ITexture : public GpuResource
 {
 
 };
@@ -54,38 +68,24 @@ class ITexture2D : public ITexture
 
 };
 
-class IRenderTarget : public OmnityObject
+class IRenderTarget : public GpuResource
 {
 
 };
 
-class IShader : public OmnityObject
+class IShader : public GpuResource
 {
 
 };
 
-class IRenderPipeline : public OmnityObject
+class IRenderPipeline : public GpuResource
 {
 
 };
 
-class IDescriptor : public OmnityObject
+class IDescriptor : public GpuResource
 {
 
 };
 
 OMNITY_END
-
-
-#ifdef OMNITY_USE_VULKAN
-#include <vulkan/vulkan.hpp>
-OMNITY_BEGIN
-class VkGpuDevice : IGpuDevice
-{
-	vk::Instance _instance;
-public:
-	VkGpuDevice();
-	~VkGpuDevice();
-};
-OMNITY_END
-#endif
