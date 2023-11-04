@@ -228,7 +228,7 @@ private:
 	T* _ptr;
 
 public:
-	ObjectRef<T> GetObjectRef()
+	ObjectRef<T> RefFromThis()
 	{
 		return ObjectRef<T>(_thisRef, _ptr);
 	}
