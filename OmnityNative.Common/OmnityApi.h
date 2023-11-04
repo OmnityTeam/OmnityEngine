@@ -65,8 +65,8 @@ struct ObjectRefState
 	using Count = UInt;
 	using AtomicCount = std::atomic<Count>;
 	AtomicCount count = 0;
-	void* ptr = nullptr;
-	Destructor destructor;
+	void* originalPtr = nullptr;
+	Destructor destructor = nullptr;
 };
 
 struct CObjectRef
@@ -109,7 +109,7 @@ private:
 		++OmnityObjectCount;
 #endif
 		_refInfo = new ObjectRefState();
-		_refInfo->ptr = ptr;
+		_refInfo->originalPtr = ptr;
 		_refInfo->destructor = &ObjectRef<T>::Destructor;
 		_ptr = ptr;
 		++_refInfo->count;
@@ -211,7 +211,7 @@ private:
 	}
 	static void Destructor(ObjectRefState* ref)
 	{
-		delete reinterpret_cast<T*>(ref->ptr); ref->ptr = 0;
+		delete reinterpret_cast<T*>(ref->originalPtr); ref->originalPtr = 0;
 		delete ref;
 #ifdef OMNITY_ENABLE_OBJECT_COUNTER
 		--OmnityObjectCount;
