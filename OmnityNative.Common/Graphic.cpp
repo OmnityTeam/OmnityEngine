@@ -13,12 +13,12 @@ GraphicContext::GraphicContext(GraphicApi api)
 	{
 #ifdef OMNITY_USE_VULKAN
 	case GraphicApi::Vulkan:
-		_device = ObjectRef<VkGpuDevice>(new VkGpuDevice()).CastTo<IGpuDevice>();
+		_device = ObjectRef<VkGpuDevice>::New().CastTo<IGpuDevice>();
 		break;
 #endif
 
 	default:
-		throw new std::exception("Unsupported api");
+		throw new std::exception();
 	}
 }
 

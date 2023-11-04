@@ -17,7 +17,7 @@ const vk::Device& VkResource::CurrentDevice() const
 
 ObjectRef<IIndexBuffer> VkGpuDevice::CreateIndexBuffer(int size)
 {
-	auto vkBuffer = ObjectRef<VkIndexBuffer>(new VkIndexBuffer(GetObjectRef(), true, true, 1024));
+	auto vkBuffer = ObjectRef<VkIndexBuffer>::New(GetObjectRef(), true, true, 1024);
 	auto result = vkBuffer.CastTo<IIndexBuffer>();
 	return result;
 }

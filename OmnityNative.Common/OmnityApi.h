@@ -30,7 +30,7 @@ constexpr auto OMNITY_PLATFORM_ID = OMNITY_PLATFORM_ID_ANDROID;
 #define OMNITY_API_METHOD(CLASS, METHOD, ...) CLASS##__##METHOD(OMNITY_NAMESPACE::CObjectRef* __ThisRef, ##__VA_ARGS__)
 #define OMNITY_API_CTOR(CLASS, ...) OMNITY_NAMESPACE::CObjectRef* CLASS##__Ctor(__VA_ARGS__)
 
-#define OMNITY_API_CTOR_CREATE_OBJECT(CLASS, ...) (OMNITY_NAMESPACE::ObjectRef<OMNITY_NAMESPACE::CLASS>(new OMNITY_NAMESPACE::CLASS(__VA_ARGS__)).RequireManagedRef())
+#define OMNITY_API_CTOR_CREATE_OBJECT(CLASS, ...) (OMNITY_NAMESPACE::ObjectRef<OMNITY_NAMESPACE::CLASS>::New(__VA_ARGS__).RequireManagedRef())
 
 #include <atomic>
 
@@ -87,34 +87,44 @@ private:
 	ObjectRefState* _refInfo;
 	T* _ptr;
 
-	template<class T,
+	template<class T2,
 		typename std::enable_if <
-		std::is_base_of<EnableRefFromThis<T>, T>{},
-		bool > ::type = true >
-	inline void BindThisRef(T * ptr)
+		std::is_base_of<EnableRefFromThis<T2>, T2>{},
+		bool> ::type = true >
+	inline void BindThisRef(T2 * ptr)
 	{
-		dynamic_cast<EnableRefFromThis<T>*>(ptr)->_thisRef = _refInfo;
-		dynamic_cast<EnableRefFromThis<T>*>(ptr)->_ptr = _ptr;
+		dynamic_cast<EnableRefFromThis<T2>*>(ptr)->_thisRef = _refInfo;
+		dynamic_cast<EnableRefFromThis<T2>*>(ptr)->_ptr = _ptr;
 	}
 
-	template<class T,
+	template<class T2,
 		typename std::enable_if <
-		!std::is_base_of<EnableRefFromThis<T>, T>{},
-		bool > ::type = true >
-	inline void BindThisRef(T * ptr) {}
+		!std::is_base_of<EnableRefFromThis<T2>, T2>{},
+		bool > ::type = true>
+	inline void BindThisRef(T2 * ptr) {}
 
-public:
-	ObjectRef(T* ptr = nullptr)
+	ObjectRef(T* ptr)
 	{
 #ifdef OMNITY_ENABLE_OBJECT_COUNTER
 		++OmnityObjectCount;
 #endif
 		_refInfo = new ObjectRefState();
-		_refInfo->ptr = (void*)ptr;
+		_refInfo->ptr = ptr;
 		_refInfo->destructor = &ObjectRef<T>::Destructor;
 		_ptr = ptr;
 		++_refInfo->count;
 		BindThisRef(_ptr);
+	}
+public:
+	ObjectRef(std::nullptr_t ptr = nullptr)
+	{
+		_refInfo = nullptr;
+		_ptr = nullptr;
+	}
+	template<typename... TArgs>
+	static ObjectRef<T> New(TArgs... args)
+	{
+		return ObjectRef<T>(new T(args...));
 	}
 
 	ObjectRef(const ObjectRef& objRef)
@@ -172,30 +182,30 @@ public:
 		return cRef;
 	}
 private:
-	void DangerousAddRef() const
+	inline void DangerousAddRef() const
 	{
 		DangerousAddRef(_refInfo, _ptr);
 	}
-	void DangerousRelease() const
+	inline void DangerousRelease() const
 	{
 		DangerousRelease(_refInfo, _ptr);
 	}
-	static void DangerousAddRef(ObjectRefState* ref, T* ptr)
+	static inline void DangerousAddRef(ObjectRefState* ref, T* ptr)
 	{
 		if (ref == nullptr) return;
 		++(*ref).count;
 	}
-	static void DangerousRelease(ObjectRefState* ref, T* ptr)
+	static inline void DangerousRelease(ObjectRefState* ref, T* ptr)
 	{
 		if (ref == nullptr) return;
 		if (--ref->count == 0)
 			ref->destructor(ref);
 	}
-	static void DangerousAddCRef(CObjectRef* ref)
+	static inline void DangerousAddCRef(CObjectRef* ref)
 	{
 		DangerousAddRef(ref->refInfo, reinterpret_cast<T*>(ref->ptr));
 	}
-	static void DangerousCRelease(CObjectRef* ref)
+	static inline void DangerousCRelease(CObjectRef* ref)
 	{
 		DangerousRelease(ref->refInfo, reinterpret_cast<T*>(ref->ptr));
 	}

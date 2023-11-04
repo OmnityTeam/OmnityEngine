@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Omnity.Player.Android", "Om
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Omnity.Editor.Windows", "Omnity.Editor.Windows\Omnity.Editor.Windows.csproj", "{3E977450-CFEE-4F5E-9653-29B400FF162F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OmnityEngine.Build.SourceGenerator", "OmnityEngine.Build.SourceGenerator\OmnityEngine.Build.SourceGenerator.csproj", "{11789339-4C4E-4C22-B80B-A2C9BDF66739}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OmnityEngine.Build.SourceGenerator", "OmnityEngine.Build.SourceGenerator\OmnityEngine.Build.SourceGenerator.csproj", "{11789339-4C4E-4C22-B80B-A2C9BDF66739}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

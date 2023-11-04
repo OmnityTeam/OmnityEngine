@@ -11,19 +11,30 @@
 	<SupportedOSPlatformVersion>21.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Debugger>Xamarin</Debugger>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Debugger>Xamarin</Debugger>
+  </PropertyGroup>
+
   <ItemGroup>
 	  <ProjectReference Include="..\OmnityEngine.Core\OmnityEngine.Core.csproj" />
   </ItemGroup>
 
   <Target Name="BuildNative" BeforeTargets="BeforeBuild">
-    <Message Text="BuildNative" Importance="high" />
+    <Message Text="Build Native ARM Library" Importance="high" />
 	<MSBuild Projects="..\OmnityNative.Android\OmnityNative.Android.vcxproj" Properties="Platform=ARM" />
+    <Message Text="Build Native ARM64 Library" Importance="high" />
 	<MSBuild Projects="..\OmnityNative.Android\OmnityNative.Android.vcxproj" Properties="Platform=ARM64" />
+    <Message Text="Build Native x86 Library" Importance="high" />
 	<MSBuild Projects="..\OmnityNative.Android\OmnityNative.Android.vcxproj" Properties="Platform=x86" />
+    <Message Text="Build Native x64 Library" Importance="high" />
 	<MSBuild Projects="..\OmnityNative.Android\OmnityNative.Android.vcxproj" Properties="Platform=x64" />
   </Target>
 	
-  <ItemGroup Condition="'$(Configuration)'=='Release'">
+  <ItemGroup>
 	<AndroidNativeLibrary Include="$(SolutionDir)Binary/android-x86/$(Configuration)/libOmnityNative.so">
       <Abi>x86</Abi>
     </AndroidNativeLibrary>

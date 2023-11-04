@@ -14,13 +14,13 @@ class VkResource : virtual public IGpuResources
 	ObjectRef<VkGpuDevice> _owner;
 protected:
 	VkResource(ObjectRef<VkGpuDevice> device) : _owner(device) {}
-	~VkResource() = default;
+	virtual ~VkResource() = default;
 
 	const vk::Instance& CurrentInstance() const;
 	const vk::Device& CurrentDevice() const;
 };
 
-class VkGpuDevice : public EnableRefFromThis<VkGpuDevice>, virtual public IGpuDevice
+class VkGpuDevice final : public EnableRefFromThis<VkGpuDevice>, virtual public IGpuDevice
 {
 	friend class VkResource;
 protected:
@@ -37,7 +37,7 @@ public:
 		auto minor = VK_VERSION_MINOR(apiVersion);
 		auto patch = VK_VERSION_PATCH(apiVersion);
 		if (major < 1 || minor < 1)
-			throw new std::exception("require vulkan 1.1");
+			throw new std::exception();
 
 		auto instanceLayer = vk::enumerateInstanceLayerProperties();
 		auto instanceExtension = vk::enumerateInstanceExtensionProperties();
@@ -51,7 +51,9 @@ public:
 		vk::InstanceCreateInfo instanceCreateInfo;
 		std::vector<const char*> enabledLayer
 		{
+#if _WIN32
 			"VK_LAYER_KHRONOS_validation"
+#endif
 		};
 		instanceCreateInfo.setPEnabledLayerNames(enabledLayer);
 		instanceCreateInfo.setPApplicationInfo(&appInfo);
@@ -61,7 +63,7 @@ public:
 		auto queueInfo = physicalDevices[0].getQueueFamilyProperties();
 		std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
 		auto list = { 1.0f };
-		queueCreateInfos.emplace_back(vk::DeviceQueueCreateInfo(vk::DeviceQueueCreateFlags::Flags(0), 0, list, 0));
+		queueCreateInfos.emplace_back(vk::DeviceQueueCreateInfo(vk::DeviceQueueCreateFlags(0), 0, list, 0));
 
 		vk::DeviceCreateInfo deviceCreateInfo;
 		deviceCreateInfo.setQueueCreateInfos(queueCreateInfos);
