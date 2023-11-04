@@ -201,10 +201,6 @@ private:
 		if (--ref->count == 0)
 			ref->destructor(ref);
 	}
-	static inline void DangerousAddCRef(CObjectRef* ref)
-	{
-		DangerousAddRef(ref->refInfo, reinterpret_cast<T*>(ref->ptr));
-	}
 	static inline void DangerousCRelease(CObjectRef* ref)
 	{
 		DangerousRelease(ref->refInfo, reinterpret_cast<T*>(ref->ptr));
