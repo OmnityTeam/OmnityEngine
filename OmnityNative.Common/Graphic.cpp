@@ -2,64 +2,18 @@
 #include "Graphic.h"
 #include <exception>
 #ifdef OMNITY_USE_VULKAN
-#include <vulkan/vulkan.hpp>
+#include "Graphic.Vulkan.h"
 #endif
 
 OMNITY_BEGIN
 
-#ifdef OMNITY_USE_VULKAN
-class VkGpuDevice : IGpuDevice
-{
-	vk::Instance _instance;
-public:
-	ObjectRef<IBuffer> CreateBuffer(int size)
-	{
-		return ObjectRef<IBuffer>();
-	}
-	VkGpuDevice()
-	{
-		auto apiVersion = vk::enumerateInstanceVersion();
-		auto major = VK_VERSION_MAJOR(apiVersion);
-		auto minor = VK_VERSION_MINOR(apiVersion);
-		auto patch = VK_VERSION_PATCH(apiVersion);
-		if (major < 1 || minor < 1)
-			throw new std::exception("require vulkan 1.1");
-
-		auto instanceLayer = vk::enumerateInstanceLayerProperties();
-		auto instanceExtension = vk::enumerateInstanceExtensionProperties();
-
-		vk::InstanceCreateInfo instanceCreateInfo;
-		_instance = vk::createInstance(instanceCreateInfo);
-
-		auto physicalDevices = _instance.enumeratePhysicalDevices();
-		for (const auto& device : physicalDevices)
-		{
-			
-		}
-	}
-	~VkGpuDevice()
-	{
-		_instance.destroy();
-	}
-};
-
-class VkBuffer : IBuffer
-{
-	vk::Buffer _buffer;
-public:
-
-};
-
-#endif
-
-
-GraphicHost::GraphicHost(GraphicApi api)
+GraphicContext::GraphicContext(GraphicApi api)
 {
 	switch (api)
 	{
 #ifdef OMNITY_USE_VULKAN
 	case GraphicApi::Vulkan:
-		_device = ObjectRef<IGpuDevice>((IGpuDevice*)new VkGpuDevice());
+		_device = ObjectRef<VkGpuDevice>(new VkGpuDevice()).CastTo<IGpuDevice>();
 		break;
 #endif
 
@@ -68,9 +22,26 @@ GraphicHost::GraphicHost(GraphicApi api)
 	}
 }
 
+ObjectRef<IIndexBuffer> GraphicContext::CreateIndexBuffer(int size)
+{
+	return _device->CreateIndexBuffer(size);
+}
+
 OMNITY_END
 
-OMNITY_API_EXPORT OMNITY_API_CTOR(GraphicHost, OMNITY_NAMESPACE::GraphicApi api)
+OMNITY_API_EXPORT OMNITY_API_CTOR(GraphicContext, OMNITY_NAMESPACE::GraphicApi api)
 {
-	return OMNITY_API_CTOR_CREATE_OBJECT(GraphicHost, api);
+	return OMNITY_API_CTOR_CREATE_OBJECT(GraphicContext, api);
+}
+
+OMNITY_API_EXPORT OMNITY_NAMESPACE::CObjectRef* OMNITY_API_METHOD(GraphicContext, CreateIndexBuffer, OMNITY_NAMESPACE::UInt size)
+{
+	OMNITY_DEFINE_THIS(GraphicContext);
+	return This->CreateIndexBuffer(size).RequireManagedRef();
+}
+
+OMNITY_API_EXPORT OMNITY_NAMESPACE::UInt OMNITY_API_METHOD(IndexBuffer, GetSize)
+{
+	OMNITY_DEFINE_THIS(IIndexBuffer);
+	return This->GetSize();
 }

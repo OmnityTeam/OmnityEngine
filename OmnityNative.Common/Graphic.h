@@ -16,6 +16,7 @@ enum GraphicApi
 
 class IGpuDevice;
 class IBuffer;
+class IIndexBuffer;
 class ITexture;
 class ITexture2D;
 class IRenderTarget;
@@ -23,69 +24,36 @@ class IShader;
 class IRenderPipeline;
 class IDescriptor;
 
-class GraphicHost : public OmnityObject
+class GraphicContext
 {
 private:
 	ObjectRef<IGpuDevice> _device;
 
 public:
-	GraphicHost(GraphicApi api);
+	ObjectRef<IIndexBuffer> CreateIndexBuffer(int size);
+	GraphicContext(GraphicApi api);
+	~GraphicContext() {}
 };
 
-class IGpuDevice : public OmnityObject
+class IGpuDevice
 {
 public:
-	virtual ObjectRef<IBuffer> CreateBuffer(int size) = 0;
-
-protected:
-	IGpuDevice() {}
-	~IGpuDevice() {}
+	virtual ObjectRef<IIndexBuffer> CreateIndexBuffer(int size) = 0;
 };
 
-class GpuResource : public OmnityObject
+class IGpuResources
 {
-private:
-	ObjectRef<IGpuDevice> _owner;
 };
 
-class IBuffer : public GpuResource
+class IBuffer : virtual public IGpuResources
 {
 public:
-	virtual void CopyTo(ObjectRef<IBuffer> dest) = 0;
-
-protected:
-	IBuffer() {}
-	~IBuffer() {}
+	virtual UInt GetSize() = 0;
 };
 
-class ITexture : public GpuResource
+class IIndexBuffer : virtual public IBuffer
 {
-
 };
 
-class ITexture2D : public ITexture
-{
-
-};
-
-class IRenderTarget : public GpuResource
-{
-
-};
-
-class IShader : public GpuResource
-{
-
-};
-
-class IRenderPipeline : public GpuResource
-{
-
-};
-
-class IDescriptor : public GpuResource
-{
-
-};
 
 OMNITY_END

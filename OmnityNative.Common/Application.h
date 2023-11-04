@@ -5,7 +5,7 @@ OMNITY_BEGIN
 
 class Graphic;
 
-class Application : OmnityObject
+class Application
 {
 public:
 	static UShort GetPlatformId();

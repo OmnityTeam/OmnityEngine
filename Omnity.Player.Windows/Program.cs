@@ -1,17 +1,22 @@
 ﻿using OmnityEngine.Core;
 using OmnityEngine.Core.Graphic;
+using OmnityEngine.Core.Graphic.LowLevel;
 using OmnityEngine.Core.Native;
 
-void run()
+IndexBuffer? testBuffer;
+Application testApp = new Application(new ApplicationInfo
 {
-    using var app = new Application(new ApplicationInfo
-    {
-        graphicApi = GraphicApi.Vulkan
-    });
-    //buffer.Dispose();
-    //app.Dispose();
+    graphicApi = GraphicApi.Vulkan
+});
+
+while (true)
+{
+    testBuffer = testApp.GraphicContext.CreateIndexBuffer();
+    Console.WriteLine($"{NativeDiagnosis.GetNativeObjectTotal()}(Shared {NativeDiagnosis.GetNativeSharedObjectTotal()})");
+    testBuffer?.Dispose();
+    testBuffer = null;
+    GC.Collect();
+    GC.WaitForPendingFinalizers();
+    Console.WriteLine($"{NativeDiagnosis.GetNativeObjectTotal()}(Shared {NativeDiagnosis.GetNativeSharedObjectTotal()})");
 }
-run();
-//GC.Collect();
-//GC.WaitForPendingFinalizers();
 return 0;

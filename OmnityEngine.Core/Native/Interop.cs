@@ -12,6 +12,15 @@ using System.Threading.Tasks;
 
 namespace OmnityEngine.Core.Native
 {
+    public static partial class NativeDiagnosis
+    {
+
+        [LibraryImport("OmnityNative", EntryPoint = "CObjectRef__GetTotal")]
+        public static partial ulong GetNativeObjectTotal();
+        [LibraryImport("OmnityNative", EntryPoint = "CObjectRef__GetSharedTotal")]
+        public static partial ulong GetNativeSharedObjectTotal();
+    }
+
     [CustomMarshaller(typeof(NativePointer<>), MarshalMode.Default, typeof(NativeSharedPointerMarshaller<>))]
     internal static class NativeSharedPointerMarshaller<T> where T : NativeObject<T>
     {
@@ -24,10 +33,10 @@ namespace OmnityEngine.Core.Native
 
     internal partial class NativePointer : CriticalFinalizerObject, IDisposable
     {
-        [LibraryImport("OmnityNative", EntryPoint = "ObjectRefState__DangerousRelease")]
+        [LibraryImport("OmnityNative", EntryPoint = "CObjectRef__DangerousRelease")]
         internal static partial void Release(IntPtr ptr);
 
-        [LibraryImport("OmnityNative", EntryPoint = "ObjectRefState__GetRefCount")]
+        [LibraryImport("OmnityNative", EntryPoint = "CObjectRef__GetRefCount")]
         internal static partial uint GetNativeRefCount(IntPtr ptr);
 
         internal IntPtr Pointer { get; private set; }

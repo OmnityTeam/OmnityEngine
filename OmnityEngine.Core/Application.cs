@@ -1,4 +1,5 @@
 ﻿using OmnityEngine.Core.Graphic;
+using OmnityEngine.Core.Graphic.LowLevel;
 using OmnityEngine.Core.Native;
 using System;
 using System.Collections.Generic;
@@ -36,17 +37,17 @@ namespace OmnityEngine.Core
             _ => PlatformName.Unknown
         };
 
-        public GraphicHost GraphicHost { get; }
+        public GraphicContext GraphicContext { get; }
         public ApplicationInfo Info { get; }
         public Application(ApplicationInfo appInfo)
         {
             Info = appInfo;
-            GraphicHost = new GraphicHost(Info.graphicApi);
+            GraphicContext = new GraphicContext(Info.graphicApi);
         }
 
         public void Dispose()
         {
-            GraphicHost.Dispose();
+            GraphicContext.Dispose();
         }
     }
 

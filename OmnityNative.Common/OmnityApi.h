@@ -27,16 +27,17 @@ constexpr auto OMNITY_PLATFORM_ID = OMNITY_PLATFORM_ID_ANDROID;
 #define OMNITY_DEFINE_THIS(CLASS) OMNITY_NAMESPACE::ObjectRef<OMNITY_NAMESPACE::CLASS> This(__ThisRef)
 
 #define OMNITY_API_STATIC_METHOD(CLASS, METHOD, ...) CLASS##__##METHOD(__VA_ARGS__)
-#define OMNITY_API_METHOD(CLASS, METHOD, ...) CLASS##__##METHOD(OMNITY_NAMESPACE::CObjectRef __ThisRef, ##__VA_ARGS__)
-#define OMNITY_API_CTOR(CLASS, ...) OMNITY_NAMESPACE::CObjectRef CLASS##__Ctor(__VA_ARGS__)
+#define OMNITY_API_METHOD(CLASS, METHOD, ...) CLASS##__##METHOD(OMNITY_NAMESPACE::CObjectRef* __ThisRef, ##__VA_ARGS__)
+#define OMNITY_API_CTOR(CLASS, ...) OMNITY_NAMESPACE::CObjectRef* CLASS##__Ctor(__VA_ARGS__)
 
 #define OMNITY_API_CTOR_CREATE_OBJECT(CLASS, ...) (OMNITY_NAMESPACE::ObjectRef<OMNITY_NAMESPACE::CLASS>(new OMNITY_NAMESPACE::CLASS(__VA_ARGS__)).RequireManagedRef())
+
+#include <atomic>
 
 // Types
 #include <cstdint>
 #include <cfloat>
 #include <type_traits>
-#include <atomic>
 
 OMNITY_BEGIN
 using Short = int16_t;
@@ -50,48 +51,96 @@ using Bool = bool;
 using Float = float;
 using Double = double;
 
-class OmnityObject
-{
-public:
-	virtual ~OmnityObject() = default;
-};
+// Object counter
+#define OMNITY_ENABLE_OBJECT_COUNTER
+
+#ifdef OMNITY_ENABLE_OBJECT_COUNTER
+extern std::atomic<ULong> OmnityObjectCount;
+extern std::atomic<ULong> OmnitySharedObjectCount;
+#endif
 
 struct ObjectRefState
 {
+	using Destructor = void(*)(ObjectRefState*);
 	using Count = UInt;
 	using AtomicCount = std::atomic<Count>;
 	AtomicCount count = 0;
-	OmnityObject* ptr = nullptr;
+	void* ptr = nullptr;
+	Destructor destructor;
 };
 
-using CObjectRef = ObjectRefState*;
+struct CObjectRef
+{
+	using CRelease = void(*)(CObjectRef*);
+	ObjectRefState* refInfo;
+	void* ptr;
+	CRelease release;
+};
+
+template<typename T>
+class EnableRefFromThis;
 
 template<typename T>
 class ObjectRef
 {
 private:
-	CObjectRef _refInfo;
+	ObjectRefState* _refInfo;
+	T* _ptr;
+
+	template<class T,
+		typename std::enable_if <
+		std::is_base_of<EnableRefFromThis<T>, T>{},
+		bool > ::type = true >
+	inline void BindThisRef(T * ptr)
+	{
+		dynamic_cast<EnableRefFromThis<T>*>(ptr)->_thisRef = _refInfo;
+		dynamic_cast<EnableRefFromThis<T>*>(ptr)->_ptr = _ptr;
+	}
+
+	template<class T,
+		typename std::enable_if <
+		!std::is_base_of<EnableRefFromThis<T>, T>{},
+		bool > ::type = true >
+	inline void BindThisRef(T * ptr) {}
+
 public:
 	ObjectRef(T* ptr = nullptr)
 	{
+#ifdef OMNITY_ENABLE_OBJECT_COUNTER
+		++OmnityObjectCount;
+#endif
 		_refInfo = new ObjectRefState();
-		_refInfo->ptr = (OmnityObject*)ptr;
+		_refInfo->ptr = (void*)ptr;
+		_refInfo->destructor = &ObjectRef<T>::Destructor;
+		_ptr = ptr;
 		++_refInfo->count;
+		BindThisRef(_ptr);
 	}
+
 	ObjectRef(const ObjectRef& objRef)
 	{
 		_refInfo = objRef._refInfo;
+		_ptr = objRef._ptr;
 		DangerousAddRef();
 	}
-	ObjectRef(ObjectRef&& objRef)
+	ObjectRef(ObjectRef&& objRef) noexcept
 	{
 		_refInfo = objRef._refInfo;
+		_ptr = objRef._ptr;
 		objRef._refInfo = nullptr;
 	}
-	ObjectRef(CObjectRef cref)
+	ObjectRef(CObjectRef* cref) : ObjectRef(cref->refInfo, reinterpret_cast<T*>(cref->ptr)) {}
+	ObjectRef(ObjectRefState* cref, T* ptr)
 	{
 		_refInfo = cref;
+		_ptr = ptr;
 		DangerousAddRef();
+		BindThisRef(_ptr);
+	}
+	template<typename TTo>
+	ObjectRef<TTo> CastTo() const
+	{
+		return ObjectRef<TTo>(_refInfo, dynamic_cast<TTo*>(reinterpret_cast<T*>(_ptr)));
 	}
 	ObjectRef operator=(const ObjectRef& r)
 	{
@@ -99,45 +148,79 @@ public:
 		DangerousRelease();
 		_refInfo = r._refInfo;
 		DangerousAddRef();
+		_ptr = r._ptr;
 		return *this;
 	}
-	T* operator->()
+	T* operator->() const
 	{
-		return (T*)_refInfo->ptr;
+		return _ptr;
 	}
 	~ObjectRef()
 	{
 		DangerousRelease();
 	}
-	CObjectRef RequireManagedRef()
+	CObjectRef* RequireManagedRef() const
 	{
 		DangerousAddRef();
-		return _refInfo;
+		auto cRef = new CObjectRef();
+		cRef->refInfo = _refInfo;
+		cRef->ptr = _ptr;
+		cRef->release = &ObjectRef<T>::DangerousCRelease;
+#ifdef OMNITY_ENABLE_OBJECT_COUNTER
+		++OmnitySharedObjectCount;
+#endif
+		return cRef;
 	}
-	static void DangerousAddRef(CObjectRef ref)
+private:
+	void DangerousAddRef() const
+	{
+		DangerousAddRef(_refInfo, _ptr);
+	}
+	void DangerousRelease() const
+	{
+		DangerousRelease(_refInfo, _ptr);
+	}
+	static void DangerousAddRef(ObjectRefState* ref, T* ptr)
 	{
 		if (ref == nullptr) return;
 		++(*ref).count;
 	}
-	static void DangerousRelease(CObjectRef ref)
+	static void DangerousRelease(ObjectRefState* ref, T* ptr)
 	{
 		if (ref == nullptr) return;
 		if (--ref->count == 0)
-			Dispose(ref);
+			ref->destructor(ref);
 	}
-private:
-	void DangerousAddRef()
+	static void DangerousAddCRef(CObjectRef* ref)
 	{
-		DangerousAddRef(_refInfo);
+		DangerousAddRef(ref->refInfo, reinterpret_cast<T*>(ref->ptr));
 	}
-	void DangerousRelease()
+	static void DangerousCRelease(CObjectRef* ref)
 	{
-		DangerousRelease(_refInfo);
+		DangerousRelease(ref->refInfo, reinterpret_cast<T*>(ref->ptr));
 	}
-	static void Dispose(CObjectRef ref)
+	static void Destructor(ObjectRefState* ref)
 	{
-		delete ref->ptr;
+		delete reinterpret_cast<T*>(ref->ptr); ref->ptr = 0;
 		delete ref;
+#ifdef OMNITY_ENABLE_OBJECT_COUNTER
+		--OmnityObjectCount;
+#endif
+	}
+};
+
+template<typename T>
+class EnableRefFromThis
+{
+	friend class ObjectRef<T>;
+private:
+	ObjectRefState* _thisRef;
+	T* _ptr;
+
+public:
+	ObjectRef<T> GetObjectRef()
+	{
+		return ObjectRef<T>(_thisRef, _ptr);
 	}
 };
 

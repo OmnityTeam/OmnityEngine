@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Graphic.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Application.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Graphic.Vulkan.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Graphic.Vulkan.h" />
     <ClCompile Include="$(MSBuildThisFileDirectory)OmnityApi.cpp" />
   </ItemGroup>
 </Project>
