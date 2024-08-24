@@ -1,4 +1,4 @@
-#include "Application.h"
+#include "Core.h"
 #include "Graphic.h"
 
 void Application::Run()

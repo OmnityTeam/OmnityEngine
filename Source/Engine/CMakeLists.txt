@@ -1,2 +1,5 @@
-omnity_add_executable(OmnityEngine)
-omnity_target_add_module(OmnityEngine Entry RHIVulkan)
+omnity_add_library(OmnityRuntime SHARED)
+omnity_target_link_module(OmnityRuntime Core)
+
+omnity_add_executable(OmnityApp)
+target_link_libraries(OmnityApp OmnityRuntime)
