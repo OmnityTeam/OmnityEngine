@@ -1,0 +1,2 @@
+omnity_add_executable(OmnityEngine)
+omnity_target_add_module(OmnityEngine Entry RHIVulkan)
