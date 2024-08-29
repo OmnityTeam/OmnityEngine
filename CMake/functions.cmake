@@ -78,7 +78,12 @@ function(omnity_get_current_space_name var_name)
 endfunction()
 
 function(omnity_add_executable target_name)
-	add_executable(${ARGV} "${target_name}.cpp")
+	set(EXECUTE_SOURCE "")
+	list(APPEND EXECUTE_SOURCE "${target_name}.cpp")
+	if (WIN32 AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${target_name}.rc")
+		list(APPEND EXECUTE_SOURCE "${target_name}.rc")
+	endif()
+	add_executable(${ARGV} ${EXECUTE_SOURCE})
 endfunction()
 
 function(omnity_add_library target_name)
