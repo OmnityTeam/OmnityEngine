@@ -3,8 +3,8 @@
 #else
 #error TODO...
 #endif
-OMNITY_API void OmnityMain(int argc, char* argv[]);
-int main(int argc, char* argv[])
-{
+OMNITY_API void OmnityMain(int argc, const char* argv[]);
+
+int main(int argc, const char* argv[]) {
 	OmnityMain(argc, argv);
 }

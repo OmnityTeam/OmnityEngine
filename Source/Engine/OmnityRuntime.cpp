@@ -6,8 +6,7 @@
 #error TODO...
 #endif
 
-OMNITY_API void OmnityMain(int argc, char* argv[])
-{
-	Application app;
-	app.Run();
+OMNITY_API void OmnityMain(int argc, const char* argv[]) {
+	Omnity::Core::Application app;
+	app.Run(argc, argv);
 }

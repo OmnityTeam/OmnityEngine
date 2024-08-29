@@ -16,7 +16,7 @@ endfunction()
 function(omnity_add_compile_definitions)
 	omnity_get_current_module_target_name(CURRENT_MODULE_TARGET_NAME)
 	foreach (ITEM IN LISTS ARGN)
-		add_compile_definitions(${CURRENT_MODULE_TARGET_NAME} ${ITEM})
+		target_compile_definitions(${CURRENT_MODULE_TARGET_NAME} PRIVATE ${ITEM})
 	endforeach()
 endfunction()
 
