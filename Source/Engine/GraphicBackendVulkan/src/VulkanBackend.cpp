@@ -7,7 +7,7 @@
 namespace Omnity::Graphic::Backend::Vulkan {
 	class VulkanContext final : public GraphicContext {
 	public:
-		bool SetupContext();
+		bool SetupContext() override;
 		~VulkanContext() override = default;
 	};
 	bool VulkanBackend::Setup() {

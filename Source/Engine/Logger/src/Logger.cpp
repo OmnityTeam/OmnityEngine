@@ -1,7 +1,6 @@
 #include "Logger.h"
 #include "OmnityString.h"
 #if WIN32
-#pragma warning(disable:5039)
 #include <Windows.h>
 #include <locale.h>
 #endif

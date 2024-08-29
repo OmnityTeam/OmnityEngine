@@ -1,5 +1,4 @@
 #ifdef WIN32
-#pragma warning(disable:5039)
 #include <Windows.h>
 #endif
 #include "OmnityString.h"
