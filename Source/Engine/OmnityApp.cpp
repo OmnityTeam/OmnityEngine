@@ -4,7 +4,7 @@
 #error TODO...
 #endif
 OMNITY_API int OmnityMain(int argc, const char* argv[]);
-OMNITY_API int WOmnityMain(int argc, const wchar_t* argv[]);
+OMNITY_API int WOmnityMain(int argc, const char16_t* argv[]);
 
 #if WIN32
 #pragma runtime_checks("", off)
@@ -14,7 +14,7 @@ extern "C" {
 		LPWSTR cmdLine = GetCommandLineW();
 		int argc;
 		LPWSTR* argv = CommandLineToArgvW(cmdLine, &argc);
-		return WOmnityMain(argc, (const wchar_t**)argv);
+		return WOmnityMain(argc, (const char16_t**)argv);
 	}
 }
 #else

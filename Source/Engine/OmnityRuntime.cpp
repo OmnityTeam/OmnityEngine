@@ -11,7 +11,7 @@ OMNITY_API int OmnityMain(int argc, const char* argv[]) {
 	return 0;
 }
 
-OMNITY_API int WOmnityMain(int argc, const wchar_t* argv[]) {
+OMNITY_API int WOmnityMain(int argc, const char16_t* argv[]) {
 	Omnity::Core::Application app;
 	app.Run(argc, argv);
 	return 0;

@@ -13,14 +13,14 @@ namespace Omnity {
 			setlocale(LC_CTYPE, "");
 #endif
 		}
-		void Log(const String& category, const String& message) override {
+		void Log(const ImmutableString& category, const ImmutableString& message) override {
 #if WIN32
 			HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
 			DWORD n_written;
 			WriteConsoleW(handle, L"[", 1, &n_written, NULL);
-			WriteConsoleW(handle, category.GetCStr(), (DWORD)category.Length(), &n_written, NULL);
+			WriteConsoleW(handle, category.Ptr(), (DWORD)category.Length(), &n_written, NULL);
 			WriteConsoleW(handle, L"] ", 2, &n_written, NULL);
-			WriteConsoleW(handle, message.GetCStr(), (DWORD)message.Length(), &n_written, NULL);
+			WriteConsoleW(handle, message.Ptr(), (DWORD)message.Length(), &n_written, NULL);
 			WriteConsoleW(handle, L"\n", 1, &n_written, NULL);
 #else
 			wprintf(L"[%ls] %ls", 
@@ -38,7 +38,7 @@ namespace Omnity {
 		static Logger logger;
 		return logger;
 	}
-	void Logger::Log(const String& category, const String& message) {
+	void Logger::Log(const ImmutableString& category, const ImmutableString& message) {
 		for (const auto& sink : GetInstance()._logSinks)
 			sink->Log(category, message);
 	}
