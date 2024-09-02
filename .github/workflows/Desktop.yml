@@ -17,7 +17,7 @@ jobs:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: windows-latest
+    runs-on: [windows-latest, ubuntu-latest]
 
     steps:
     - uses: actions/checkout@v4
@@ -30,10 +30,14 @@ jobs:
         cache: true
 
     - name: Install cppcheck on Ubuntu
-      if: runner.os == 'Ubuntu'
+      if: runner.os == 'Linux'
       run: |
           sudo apt-get update
           sudo apt-get install cppcheck
+    - name: Install cppcheck on Others
+      if: runner.os != 'Linux'
+      run: |
+          echo "cppcheck is not supported on $RUNNER_OS runner."
 
     - name: Check Vcpkg
       uses: lukka/run-vcpkg@v11.5
