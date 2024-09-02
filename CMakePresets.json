@@ -1,0 +1,41 @@
+{
+  "version": 8,
+  "configurePresets": [
+    {
+      "name": "ninja-multi-vcpkg",
+      "displayName": "Ninja Multi-Config",
+      "description": "Configure with vcpkg toolchain and generate Ninja project files for all configurations with x64",
+      "binaryDir": "${sourceDir}/out/${presetName}",
+      "generator": "Ninja Multi-Config",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": {
+          "type": "FILEPATH",
+          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        }
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "ninja-multi-vcpkg-debug",
+      "configurePreset": "ninja-multi-vcpkg",
+      "displayName": "Build ninja-multi-vcpkg-debug",
+      "description": "Build Debug configuration",
+      "configuration": "Debug"
+    },
+    {
+      "name": "ninja-multi-vcpkg-release-dbginfo",
+      "configurePreset": "ninja-multi-vcpkg",
+      "displayName": "Build ninja-multi-vcpkg-release-dbginfo",
+      "description": "Build RelWithDebInfo configuration",
+      "configuration": "RelWithDebInfo"
+    },
+    {
+      "name": "ninja-multi-vcpkg-release",
+      "configurePreset": "ninja-multi-vcpkg",
+      "displayName": "Build ninja-multi-vcpkg-release",
+      "description": "Build Release configuration",
+      "configuration": "Release"
+    }
+  ]
+}
