@@ -19,6 +19,12 @@
   ],
   "buildPresets": [
     {
+      "name": "ninja-multi-vcpkg",
+      "configurePreset": "ninja-multi-vcpkg",
+      "displayName": "Build ninja-multi-vcpkg",
+      "description": "Build Debug configuration"
+    },
+    {
       "name": "ninja-multi-vcpkg-debug",
       "configurePreset": "ninja-multi-vcpkg",
       "displayName": "Build ninja-multi-vcpkg-debug",
