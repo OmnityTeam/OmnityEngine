@@ -11,7 +11,9 @@
         "CMAKE_TOOLCHAIN_FILE": {
           "type": "FILEPATH",
           "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
-        }
+        },
+        "GRAPHIC_USE_VULKAN": true,
+        "GRAPHIC_USE_DX12": false
       }
     }
   ],
