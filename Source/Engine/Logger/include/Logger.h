@@ -6,7 +6,7 @@
 namespace Omnity {
 	class LogSink {
 	public:
-		virtual void Log(const ImmutableString& category, const ImmutableString& message) = 0;
+		virtual void Log(StringRef category, StringRef message) = 0;
 		virtual ~LogSink() = default;
 	};
 	class Logger final {
@@ -18,13 +18,13 @@ namespace Omnity {
 		~Logger();
 		static Logger& GetInstance();
 	public:
-		static void Log(const ImmutableString& category, const ImmutableString& message);
+		static void Log(StringRef category, StringRef message);
 		template <class T, typename... Args>
 		static void AddLogSink(Args... args) {
 			GetInstance()._logSinks.emplace_back(std::unique_ptr<LogSink>(static_cast<LogSink*>(new T(args...))));
 		}
-		static void LogInfo(const ImmutableString& message) {
-			Log(u"Info", message);
+		static void LogInfo(StringRef message) {
+			Log(u"Info"_s, message);
 		}
 	};
 }

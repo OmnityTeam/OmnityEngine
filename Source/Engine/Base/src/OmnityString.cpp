@@ -42,5 +42,4 @@ namespace Omnity {
 			return ret;
 		}
 	}
-	String::~String() {}
 }

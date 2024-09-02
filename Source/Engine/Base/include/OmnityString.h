@@ -2,11 +2,15 @@
 #include <string>
 #include <memory>
 #include <concepts>
+#include <variant>
 
 namespace Omnity {
     using Utf8String = std::string;
     using Utf16String = std::u16string;
     using Utf32String = std::u32string;
+    using Char = char16_t;
+    class String;
+    class StringRef;
 	namespace StringUtils {
         Utf16String FromUtf8Ptr(const char8_t* str);
         Utf16String FromUtf8Ptr(const char* str, size_t len);
@@ -23,71 +27,89 @@ namespace Omnity {
         Utf16String FromUtf8(const Utf8String& str);
         Utf8String ToUtf8(const Utf16String& str);
 	}
-    class DynamicString {
-        Utf16String _data;
+    class SharedStringContainer : public std::basic_string<Char>, std::enable_shared_from_this<SharedStringContainer>
+    {
     public:
-        inline DynamicString() {}
-        inline DynamicString(const char16_t* ptr, size_t len) : _data(ptr, len) {}
-        inline DynamicString(const char16_t* ptr) : _data(ptr) {}
-        inline DynamicString(const char* ptr) : _data(StringUtils::FromUtf8Ptr(ptr)) {}
-        inline DynamicString(const wchar_t* ptr) : _data(StringUtils::FromWidePtr(ptr)) {}
+        friend class StringRef;
+        friend class StringRef;
+        using Ptr = std::shared_ptr<SharedStringContainer>;
+        using WeakPtr = std::shared_ptr<SharedStringContainer>;
+        SharedStringContainer(const SharedStringContainer& str) = delete;
+        SharedStringContainer(const SharedStringContainer&& str) = delete;
+        SharedStringContainer& operator=(SharedStringContainer&) = delete;
+        SharedStringContainer(const char16_t* ptr, size_t len) noexcept : std::basic_string<Char>(ptr, len) {}
+        SharedStringContainer(const char* ptr, size_t len) noexcept : std::basic_string<Char>(StringUtils::FromUtf8Ptr(ptr, len)) {}
+    };
+    class String {
+        SharedStringContainer::Ptr _container;
+        inline String(SharedStringContainer::Ptr container) : _container(container) {}
+    public:
+        friend class StringRef;
+        friend class StringRef;
+        inline String(const String& str) : _container(std::make_shared<SharedStringContainer>(str._container->c_str(), str._container->length())) {}
+        inline String(String&& str) noexcept : _container(std::move(str._container)) {}
+        template <typename TBaseChar>
+        inline String(const TBaseChar* ptr, size_t len) noexcept : _container(std::make_shared<SharedStringContainer>(ptr, len)) {}
+        template <typename TBaseChar>
+        inline String(const TBaseChar* ptr) noexcept : _container(std::make_shared<SharedStringContainer>(ptr, std::char_traits<TBaseChar>::length(ptr))) {}
+        inline Char* operator[](size_t i) noexcept {
+            return &_container->at(i);
+        }
+        inline const Char* operator[](size_t i) const noexcept {
+            return &_container->at(i);
+        }
+        inline StringRef SubString(size_t offset, size_t len) const noexcept;
+        inline size_t Length() const noexcept {
+            return _container->length();
+        }
         inline const char16_t* CStr() const noexcept {
-            return _data.c_str();
+            return _container->c_str();
         }
-        inline size_t Length() const noexcept {
-            return _data.length();
-        }
+        inline ~String();
     };
-    class ImmutableString {
-    protected:
-        std::u16string_view _view;
+
+    class ScopedString {
+        std::basic_string<Char> _data;
     public:
-        inline ImmutableString() : ImmutableString(nullptr, 0) {};
-        inline ImmutableString(const char16_t* ptr, size_t len) : _view(ptr, len) {}
-        inline ImmutableString(const char16_t* ptr) : ImmutableString(ptr, std::char_traits<char16_t>::length(ptr)) {}
-        inline const char16_t* Ptr() const noexcept {
-            return _view.data();
-        }
-        inline size_t Length() const noexcept {
-            return _view.length();
-        }
-        inline DynamicString ToDynamic() {
-            return DynamicString(Ptr(), Length());
-        }
-        virtual ~ImmutableString() {}
+        ScopedString(const char16_t* ptr, size_t len) noexcept : _data(ptr, len) {}
+        ScopedString(const char* ptr, size_t len) noexcept : _data(StringUtils::FromUtf8Ptr(ptr, len)) {}
+        template <typename TBaseChar>
+        ScopedString(const TBaseChar* ptr) noexcept : ScopedString(ptr, std::char_traits<TBaseChar>::length(ptr)) {}
     };
-    class String : public ImmutableString {
-        std::shared_ptr<DynamicString> _ref;
-        String() {}
+
+    class StringRef {
+        String _sharedStr;
+        size_t _len;
+        size_t _offset;
     public:
-        String(String& str) noexcept {
-            _ref = str._ref;
+        template <typename TBaseChar>
+        inline StringRef(const TBaseChar* ptr, size_t len) noexcept : _sharedStr(ptr, len), _offset(0), _len(len) {}
+        template <typename TBaseChar>
+        inline StringRef(const TBaseChar* ptr) noexcept : StringRef(ptr, std::char_traits<TBaseChar>::length(ptr)) {}
+        inline StringRef(StringRef&& strRef) noexcept
+            : _sharedStr(std::move(strRef._sharedStr)), _offset(strRef._offset), _len(strRef._len) {}
+        inline StringRef(const StringRef& strRef)
+            : _sharedStr(strRef._sharedStr._container), _offset(strRef._offset), _len(strRef._len) {}
+        inline StringRef(const String& str, size_t offset, size_t len)
+            : _sharedStr(str._container), _offset(offset), _len(len) {}
+        inline StringRef(const String& str)
+            : StringRef(str, 0, str.Length()) {}
+        inline const Char* operator[](size_t i) const noexcept {
+            return _sharedStr[i + _offset];
         }
-        String(String&& str) noexcept {
-            _ref = std::move(str._ref);
-            str._ref = nullptr;
+        inline const String AsString() const {
+            if (_sharedStr.Length() == _len && _offset == 0)
+                return _sharedStr;
+            return String(_sharedStr[_offset], _len);
         }
-        template<typename... Args>
-        inline String(Args... args) {
-            _ref = std::make_shared<DynamicString>(args...);
-            _view = std::u16string_view(_ref->CStr(), _ref->Length());
-        }
-        template<typename... Args>
-        String(const DynamicString& str, Args... args) {
-            _ref = std::make_shared<DynamicString>(args...);
-            _view = std::u16string_view(_ref->CStr(), _ref->Length());
-        }
-        template<typename... Args>
-        String(const DynamicString&& str, Args... args) {
-            _ref = std::make_shared<DynamicString>(args...);
-            _view = std::u16string_view(_ref->CStr(), _ref->Length());
-        }
-        ~String();
-        inline String SubString(size_t startPos, size_t length) {
-            String str;
-            str._ref = _ref;
-            str._view = _view.substr(startPos, length);
-            return str;
-        }
+        inline ~StringRef();
     };
+    inline StringRef::~StringRef() = default;
+    inline String::~String() = default;
+    inline StringRef String::SubString(size_t offset, size_t len) const noexcept {
+        return StringRef(*this, offset, len);
+    }
+    inline StringRef operator ""_s(const char16_t* ptr, size_t len) noexcept {
+        return String(ptr, len);
+    }
 }
