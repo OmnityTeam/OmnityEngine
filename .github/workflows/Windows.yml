@@ -35,5 +35,6 @@ jobs:
     - name: Build CMake
       uses: lukka/run-cmake@v10
       with:
+        configurePreset: 'ninja-multi-vcpkg'
         buildPreset: 'ninja-multi-vcpkg-release'
 

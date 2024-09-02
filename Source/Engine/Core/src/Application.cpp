@@ -27,7 +27,6 @@ namespace Omnity::Core {
 		}
 	}
 	void Setup(const std::vector<String>& args) {
-		SpeedTest();
 		auto str = String(u"1234");
 		auto str2 = std::move(str);
 		auto str3 = str2;
@@ -39,6 +38,7 @@ namespace Omnity::Core {
 			Logger::LogInfo(arg);
 		Omnity::Graphic::InitGraphic();
 		Omnity::Graphic::SetupGraphicBackend();
+		SpeedTest();
 	}
 	void Application::Run(int argc, const char* argv[]) {
 		std::vector<String> args;
