@@ -15,7 +15,7 @@ namespace Omnity {
         Utf16String FromUtf8Ptr(const char8_t* str);
         Utf16String FromUtf8Ptr(const char* str, size_t len);
         inline Utf16String FromUtf8Ptr(const char* str) {
-            return FromUtf8Ptr(str, strlen(str));
+            return FromUtf8Ptr(str, std::char_traits<char>::length(str));
         }
         Utf16String FromUtf32Ptr(const char32_t* str);
         inline Utf16String FromWidePtr(const wchar_t* str) {
