@@ -64,12 +64,8 @@ namespace Omnity {
         inline String(const TBaseChar* ptr) : String(ptr, std::char_traits<TBaseChar>::length(ptr)) {}
         inline String(const String& str) : std::basic_string<Char>(str) {}
         inline String(String&& str) noexcept : std::basic_string<Char>(std::forward<std::basic_string<Char>>(str)) {}
-        inline const WordIterator<String::iterator> WordBegin() {
-            return WordIterator<String::iterator>(begin(), end());
-        }
-        inline const WordIterator<String::iterator> WordEnd() {
-            return WordIterator<String::iterator>(end(), end());
-        }
+        const WordIterator<String::iterator> WordBegin();
+        const WordIterator<String::iterator> WordEnd();
         inline StringRef substr(size_t off, size_t len);
     };
     class StringRef : public std::basic_string_view<Char> {
@@ -77,12 +73,8 @@ namespace Omnity {
         inline StringRef(const String& str) : std::basic_string_view<Char>(str.data(), str.length()) {}
         inline StringRef(const Char* ptr) : std::basic_string_view<Char>(ptr, std::char_traits<Char>::length(ptr)) {}
         inline StringRef(const Char* ptr, size_t len) : std::basic_string_view<Char>(ptr, len) {}
-        inline const WordIterator<StringRef::iterator> WordBegin() {
-            return WordIterator<StringRef::iterator>(begin(), end());
-        }
-        inline const WordIterator<StringRef::iterator> WordEnd() {
-            return WordIterator<StringRef::iterator>(end(), end());
-        }
+        const WordIterator<StringRef::iterator> WordBegin();
+        const WordIterator<StringRef::iterator> WordEnd();
     };
     inline StringRef String::substr(size_t off, size_t len) {
         return StringRef(this->data() + off, len);

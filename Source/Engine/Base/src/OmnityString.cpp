@@ -30,8 +30,6 @@ namespace Omnity {
 			return ret;
 		}
 	}
-	template struct WordIterator<String::const_iterator>;
-	template struct WordIterator<StringRef::const_iterator>;
 
 	template <typename TChar16Iterator>
 	WordIterator<TChar16Iterator>& WordIterator<TChar16Iterator>::operator++() {
@@ -45,5 +43,17 @@ namespace Omnity {
 			  "Parties can only have 3 players" };
 		auto copyIter = _strIter;
 		return utf8::next16(copyIter, _strEnd);
+	}
+	const WordIterator<StringRef::iterator> StringRef::WordBegin() {
+		return WordIterator<StringRef::iterator>(begin(), end());
+	}
+	const WordIterator<StringRef::iterator> StringRef::WordEnd() {
+		return WordIterator<StringRef::iterator>(end(), end());
+	}
+	const WordIterator<String::iterator> String::WordBegin() {
+		return WordIterator<String::iterator>(begin(), end());
+	}
+	const WordIterator<String::iterator> String::WordEnd() {
+		return WordIterator<String::iterator>(end(), end());
 	}
 }
