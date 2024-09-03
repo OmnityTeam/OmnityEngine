@@ -2,7 +2,7 @@
 #if WIN32
 #define OMNITY_API extern "C" __declspec(dllexport)
 #else
-#error TODO...
+#define OMNITY_API extern "C" __attribute__ ((visibility("default")))
 #endif
 
 OMNITY_API int OmnityMain(int argc, const char* argv[]) {

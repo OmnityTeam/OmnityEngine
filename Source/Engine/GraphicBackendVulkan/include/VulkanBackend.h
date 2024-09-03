@@ -9,6 +9,6 @@ namespace Omnity::Graphic::Backend::Vulkan {
 	public:
 		bool Setup() override;
 		std::weak_ptr<GraphicContext> GetContext() override;
-		~VulkanBackend() override;
+		~VulkanBackend();
 	};
 }

@@ -1,7 +1,7 @@
 #if WIN32
 #define OMNITY_API extern "C" __declspec(dllimport)
 #else
-#error TODO...
+#define OMNITY_API extern "C"
 #endif
 OMNITY_API int OmnityMain(int argc, const char* argv[]);
 OMNITY_API int WOmnityMain(int argc, const char16_t* argv[]);

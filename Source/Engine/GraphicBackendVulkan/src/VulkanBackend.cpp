@@ -27,6 +27,5 @@ namespace Omnity::Graphic::Backend::Vulkan {
 	bool VulkanContext::SetupContext() {
 		return true;
 	}
-
 	VulkanBackend::~VulkanBackend() = default;
 }
