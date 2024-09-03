@@ -29,31 +29,15 @@ namespace Omnity {
 			utf8::utf16to8(str.begin(), str.end(), std::back_inserter(ret));
 			return ret;
 		}
-	}
-
-	template <typename TChar16Iterator>
-	WordIterator<TChar16Iterator>& WordIterator<TChar16Iterator>::operator++() {
-		utf8::next16(_strIter, _strEnd);
-		return *this;
-	}
-	template <typename TChar16Iterator>
-	char32_t WordIterator<TChar16Iterator>::operator*() const {
-		if (_strIter == _strEnd)
-			throw std::out_of_range{
-			  "Parties can only have 3 players" };
-		auto copyIter = _strIter;
-		return utf8::next16(copyIter, _strEnd);
-	}
-	const WordIterator<StringRef::iterator> StringRef::WordBegin() {
-		return WordIterator<StringRef::iterator>(begin(), end());
-	}
-	const WordIterator<StringRef::iterator> StringRef::WordEnd() {
-		return WordIterator<StringRef::iterator>(end(), end());
-	}
-	const WordIterator<String::iterator> String::WordBegin() {
-		return WordIterator<String::iterator>(begin(), end());
-	}
-	const WordIterator<String::iterator> String::WordEnd() {
-		return WordIterator<String::iterator>(end(), end());
+		template <typename TIter>
+		inline char32_t NextChar(TIter& iter, TIter end) {
+			return utf8::next16(iter, end);
+		}
+		char32_t NextChar(StringRef::const_iterator& iter, StringRef::const_iterator end) {
+			return NextChar<StringRef::const_iterator>(iter, end);
+		}
+		char32_t NextChar(String::const_iterator& iter, String::const_iterator end) {
+			return NextChar<String::const_iterator>(iter, end);
+		}
 	}
 }
