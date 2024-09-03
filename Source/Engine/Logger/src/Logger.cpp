@@ -3,32 +3,30 @@
 #if WIN32
 #include <Windows.h>
 #include <locale.h>
+#include <iostream>
 #endif
 
 namespace Omnity {
 	class ConsoleLogSink : public LogSink {
-	public:
-		ConsoleLogSink() {
+		inline void PrintW(StringRef str) {
 #if WIN32
-			setlocale(LC_CTYPE, "");
+			WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), str.data(), (DWORD)str.length(), nullptr, nullptr);
+#else
+			for (auto iter = str.WordBegin(); iter != str.WordEnd(); ++iter) {
+				putwchar((wchar_t)*iter);
+			}
 #endif
 		}
+	public:
+		ConsoleLogSink() {
+			setlocale(LC_CTYPE, "");
+		}
 		void Log(StringRef category, StringRef message) override {
-			auto cat = category.AsString();
-			auto msg = message.AsString();
-#if WIN32
-			HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-			DWORD n_written;
-			WriteConsoleW(handle, L"[", 1, &n_written, NULL);
-			WriteConsoleW(handle, cat.CStr(), (DWORD)cat.Length(), &n_written, NULL);
-			WriteConsoleW(handle, L"] ", 2, &n_written, NULL);
-			WriteConsoleW(handle, msg.CStr(), (DWORD)msg.Length(), &n_written, NULL);
-			WriteConsoleW(handle, L"\n", 1, &n_written, NULL);
-#else
-			wprintf(L"[%ls] %ls", 
-				category.GetCStr(),
-				message.GetCStr());
-#endif
+			PrintW(u"[");
+			PrintW(category);
+			PrintW(u"] ");
+			PrintW(message);
+			PrintW(u"\n");
 		}
 		~ConsoleLogSink() {}
 	}; 

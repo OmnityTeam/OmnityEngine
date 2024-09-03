@@ -24,7 +24,7 @@ namespace Omnity {
 			GetInstance()._logSinks.emplace_back(std::unique_ptr<LogSink>(static_cast<LogSink*>(new T(args...))));
 		}
 		static void LogInfo(StringRef message) {
-			Log(u"Info"_s, message);
+			Log(u"Info", message);
 		}
 	};
 }

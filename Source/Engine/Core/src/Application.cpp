@@ -19,7 +19,7 @@ namespace Omnity::Core {
 			auto elapsed1 = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 			begin = std::chrono::high_resolution_clock::now();
 			for (int i = 0; i < 10000000; ++i) {
-				ScopedString str(u"1234");
+				String str(u"1234");
 			}
 			end = std::chrono::high_resolution_clock::now();
 			auto elapsed2 = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
@@ -27,13 +27,13 @@ namespace Omnity::Core {
 		}
 	}
 	void Setup(const std::vector<String>& args) {
-		auto str = String(u"1234");
+		auto str = String(u"12🌹34");
 		auto str2 = std::move(str);
 		auto str3 = str2;
-		auto sub = str3.SubString(1, 2);
-
-		Logger::LogInfo(u"Started!🌹"_s);
-		Logger::LogInfo(u"Started!2"_s);
+		Logger::LogInfo(str2);
+		Logger::LogInfo(str3.substr(1, 3));
+		Logger::LogInfo(u"🌹Started!");
+		Logger::LogInfo(u"Started!2");
 		for (const auto& arg : args)
 			Logger::LogInfo(arg);
 		Omnity::Graphic::InitGraphic();

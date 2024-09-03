@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 3.23)
 include("CMake/functions.cmake")
 
-find_program(CPPCHECK_PATH NAMES cppcheck)
-if (EXISTS ${CPPCHECK_PATH})
-    set(CMAKE_CXX_CPPCHECK "${CPPCHECK_PATH}")
-    message("use ${CMAKE_CXX_CPPCHECK}")
+find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
+if (CMAKE_CXX_CPPCHECK)
+    message("Use ${CMAKE_CXX_CPPCHECK}")
 else()
     message(WARNING "cppcheck not found")
 endif()

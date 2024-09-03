@@ -3,6 +3,7 @@
 #include <memory>
 #include <concepts>
 #include <variant>
+#include <stdexcept>
 
 namespace Omnity {
     using Utf8String = std::string;
@@ -12,104 +13,79 @@ namespace Omnity {
     class String;
     class StringRef;
 	namespace StringUtils {
-        Utf16String FromUtf8Ptr(const char8_t* str);
-        Utf16String FromUtf8Ptr(const char* str, size_t len);
-        inline Utf16String FromUtf8Ptr(const char* str) {
-            return FromUtf8Ptr(str, std::char_traits<char>::length(str));
+        Utf16String FromUtf8Ptr(const char8_t* str, size_t len);
+        inline Utf16String FromUtf8Ptr(const char8_t* str) {
+            return FromUtf8Ptr(str, std::char_traits<char8_t>::length(str));
         }
-        Utf16String FromUtf32Ptr(const char32_t* str);
+        Utf16String FromUtf32Ptr(const char32_t* str, size_t len);
+
+        inline Utf16String FromUtf8Ptr(const char* str, size_t len) {
+            return FromUtf8Ptr(reinterpret_cast<const char8_t*>(str), len);
+        }
+        inline Utf16String FromUtf8Ptr(const char* str) {
+            return FromUtf8Ptr(reinterpret_cast<const char8_t*>(str));
+        }
+        inline Utf16String FromWidePtr(const wchar_t* str, size_t len) {
+            if constexpr (sizeof(wchar_t) == sizeof(char16_t))
+                return Utf16String(reinterpret_cast<const char16_t*>(str));
+            if constexpr (sizeof(wchar_t) == sizeof(char32_t))
+                return FromUtf32Ptr(reinterpret_cast<const char32_t*>(str), len);
+        }
         inline Utf16String FromWidePtr(const wchar_t* str) {
             if constexpr (sizeof(wchar_t) == sizeof(char16_t))
                 return Utf16String(reinterpret_cast<const char16_t*>(str));
             if constexpr (sizeof(wchar_t) == sizeof(char32_t))
-                return FromUtf32Ptr(reinterpret_cast<const char32_t*>(str));
+                return FromUtf32Ptr(reinterpret_cast<const char32_t*>(str), std::char_traits<wchar_t>::length(str));
         }
         Utf16String FromUtf8(const Utf8String& str);
         Utf8String ToUtf8(const Utf16String& str);
 	}
-    class SharedStringContainer : public std::basic_string<Char>, std::enable_shared_from_this<SharedStringContainer>
-    {
-    public:
-        friend class StringRef;
-        friend class StringRef;
-        using Ptr = std::shared_ptr<SharedStringContainer>;
-        using WeakPtr = std::shared_ptr<SharedStringContainer>;
-        SharedStringContainer(const SharedStringContainer& str) = delete;
-        SharedStringContainer(const SharedStringContainer&& str) = delete;
-        SharedStringContainer& operator=(SharedStringContainer&) = delete;
-        SharedStringContainer(const char16_t* ptr, size_t len) noexcept : std::basic_string<Char>(ptr, len) {}
-        SharedStringContainer(const char* ptr, size_t len) noexcept : std::basic_string<Char>(StringUtils::FromUtf8Ptr(ptr, len)) {}
+    template <typename TChar16Iterator>
+    struct WordIterator {
+        WordIterator(TChar16Iterator strBeg, TChar16Iterator strEnd) :
+            _strIter(strBeg), _strEnd(strEnd) {}
+        const char32_t operator*() const;
+        WordIterator& operator++();
+        bool operator==(const WordIterator& b) const {
+            return _strIter == b._strIter && _strEnd == b._strEnd;
+        }
+    private:
+        TChar16Iterator _strIter;
+        TChar16Iterator _strEnd;
     };
-    class String {
-        SharedStringContainer::Ptr _container;
-        inline String(SharedStringContainer::Ptr container) : _container(container) {}
+    class String : public std::basic_string<Char> {
     public:
-        friend class StringRef;
-        friend class StringRef;
-        inline String(const String& str) : _container(std::make_shared<SharedStringContainer>(str._container->c_str(), str._container->length())) {}
-        inline String(String&& str) noexcept : _container(std::move(str._container)) {}
-        template <typename TBaseChar>
-        inline String(const TBaseChar* ptr, size_t len) noexcept : _container(std::make_shared<SharedStringContainer>(ptr, len)) {}
-        template <typename TBaseChar>
-        inline String(const TBaseChar* ptr) noexcept : _container(std::make_shared<SharedStringContainer>(ptr, std::char_traits<TBaseChar>::length(ptr))) {}
-        inline Char* operator[](size_t i) noexcept {
-            return &_container->at(i);
-        }
-        inline const Char* operator[](size_t i) const noexcept {
-            return &_container->at(i);
-        }
-        inline StringRef SubString(size_t offset, size_t len) const noexcept;
-        inline size_t Length() const noexcept {
-            return _container->length();
-        }
-        inline const char16_t* CStr() const noexcept {
-            return _container->c_str();
-        }
-        inline ~String();
-    };
+        template<typename... TArgs>
+        inline String(TArgs... args) : std::basic_string<Char>(args...) {}
+        inline String(const char* ptr, size_t len) : std::basic_string<Char>(StringUtils::FromUtf8Ptr(ptr, len)) {}
+        inline String(const wchar_t* ptr, size_t len) : std::basic_string<Char>(StringUtils::FromWidePtr(ptr, len)) {}
+        inline String(const char32_t* ptr, size_t len) : std::basic_string<Char>(StringUtils::FromUtf32Ptr(ptr, len)) {}
+        template<typename TBaseChar>
+        inline String(const TBaseChar* ptr) : String(ptr, std::char_traits<TBaseChar>::length(ptr)) {}
+        inline String(const String& str) : std::basic_string<Char>(str) {}
+        inline String(String&& str) noexcept : std::basic_string<Char>(std::forward<std::basic_string<Char>>(str)) {}
 
-    class ScopedString {
-        std::basic_string<Char> _data;
-    public:
-        ScopedString(const char16_t* ptr, size_t len) noexcept : _data(ptr, len) {}
-        ScopedString(const char* ptr, size_t len) noexcept : _data(StringUtils::FromUtf8Ptr(ptr, len)) {}
-        template <typename TBaseChar>
-        ScopedString(const TBaseChar* ptr) noexcept : ScopedString(ptr, std::char_traits<TBaseChar>::length(ptr)) {}
-    };
-
-    class StringRef {
-        String _sharedStr;
-        size_t _len;
-        size_t _offset;
-    public:
-        template <typename TBaseChar>
-        inline StringRef(const TBaseChar* ptr, size_t len) noexcept : _sharedStr(ptr, len), _offset(0), _len(len) {}
-        template <typename TBaseChar>
-        inline StringRef(const TBaseChar* ptr) noexcept : StringRef(ptr, std::char_traits<TBaseChar>::length(ptr)) {}
-        inline StringRef(StringRef&& strRef) noexcept
-            : _sharedStr(std::move(strRef._sharedStr)), _offset(strRef._offset), _len(strRef._len) {}
-        inline StringRef(const StringRef& strRef)
-            : _sharedStr(strRef._sharedStr._container), _offset(strRef._offset), _len(strRef._len) {}
-        inline StringRef(const String& str, size_t offset, size_t len)
-            : _sharedStr(str._container), _offset(offset), _len(len) {}
-        inline StringRef(const String& str)
-            : StringRef(str, 0, str.Length()) {}
-        inline const Char* operator[](size_t i) const noexcept {
-            return _sharedStr[i + _offset];
+        const WordIterator<String::iterator> WordBegin() {
+            return WordIterator<String::iterator>(begin(), end());
         }
-        inline const String AsString() const {
-            if (_sharedStr.Length() == _len && _offset == 0)
-                return _sharedStr;
-            return String(_sharedStr[_offset], _len);
+        const WordIterator<String::iterator> WordEnd() {
+            return WordIterator<String::iterator>(end(), end());
         }
-        inline ~StringRef();
+        inline StringRef substr(size_t off, size_t len);
     };
-    inline StringRef::~StringRef() = default;
-    inline String::~String() = default;
-    inline StringRef String::SubString(size_t offset, size_t len) const noexcept {
-        return StringRef(*this, offset, len);
-    }
-    inline StringRef operator ""_s(const char16_t* ptr, size_t len) noexcept {
-        return String(ptr, len);
+    class StringRef : public std::basic_string_view<Char> {
+    public:
+        inline StringRef(const String& str) : std::basic_string_view<Char>(str.data(), str.length()) {}
+        inline StringRef(const Char* ptr) : std::basic_string_view<Char>(ptr, std::char_traits<Char>::length(ptr)) {}
+        inline StringRef(const Char* ptr, size_t len) : std::basic_string_view<Char>(ptr, len) {}
+        const WordIterator<StringRef::iterator> WordBegin() {
+            return WordIterator<StringRef::iterator>(begin(), end());
+        }
+        const WordIterator<StringRef::iterator> WordEnd() {
+            return WordIterator<StringRef::iterator>(end(), end());
+        }
+    };
+    inline StringRef String::substr(size_t off, size_t len) {
+        return StringRef(this->data() + off, len);
     }
 }
