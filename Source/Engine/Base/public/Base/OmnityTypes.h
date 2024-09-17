@@ -1,6 +1,6 @@
 #pragma once
-#include "OmnityString.h"
+#include <Base/OmnityString.h>
+#include <Base/OmnityUUID.h>
 
 namespace Omnity {
-
 }

@@ -4,6 +4,7 @@
     "vulkan-memory-allocator",
     "utfcpp",
     "fmt",
-    "gtest"
+    "gtest",
+    "stduuid"
   ]
 }
