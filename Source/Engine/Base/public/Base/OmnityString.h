@@ -4,7 +4,6 @@
 #include <concepts>
 #include <variant>
 #include <stdexcept>
-#include <format>
 #include <fmt/xchar.h>
 
 namespace Omnity {
