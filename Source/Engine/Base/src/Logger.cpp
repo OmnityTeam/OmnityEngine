@@ -1,5 +1,5 @@
-#include "Logger.h"
-#include "OmnityString.h"
+#include <Base/Logger.h>
+#include <Base/OmnityString.h>
 #if WIN32
 #include <Windows.h>
 #include <locale.h>
@@ -8,25 +8,26 @@
 
 namespace Omnity {
 	class ConsoleLogSink : public LogSink {
-		inline void PrintW(StringRef str) {
+		inline void Print(std::u16string_view str) {
+			//std::u16string s = fmt::format(u"{The answer is {}.}", 42);
 #if WIN32
 			WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), str.data(), (DWORD)str.length(), nullptr, nullptr);
 #else
-			for (auto iter = str.WordBegin(); iter != str.WordEnd(); ++iter) {
-				putwchar((wchar_t)*iter);
-			}
+			Words words(str);
+			for (const auto& word : words)
+				putwchar((wchar_t)word);
 #endif
 		}
 	public:
 		ConsoleLogSink() {
 			setlocale(LC_CTYPE, "");
 		}
-		void Log(StringRef category, StringRef message) override {
-			PrintW(u"[");
-			PrintW(category);
-			PrintW(u"] ");
-			PrintW(message);
-			PrintW(u"\n");
+		void Log(std::u16string_view category, std::u16string_view message) override {
+			Print(u"[");
+			Print(category);
+			Print(u"] ");
+			Print(message);
+			Print(u"\n");
 		}
 		~ConsoleLogSink() {}
 	}; 
@@ -38,7 +39,7 @@ namespace Omnity {
 		static Logger logger;
 		return logger;
 	}
-	void Logger::Log(StringRef category, StringRef message) {
+	void Logger::Log(std::u16string_view category, std::u16string_view message) {
 		for (const auto& sink : GetInstance()._logSinks)
 			sink->Log(category, message);
 	}

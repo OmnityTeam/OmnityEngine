@@ -5,5 +5,6 @@ namespace Omnity::Core {
 	public:
 		void Run(int argc, const char* argv[]);
 		void Run(int argc, const char16_t* argv[]);
+		~Application();
 	};
 }

@@ -1,0 +1,6 @@
+project(Test)
+add_executable(OmnityEngineTest "ResourcesTest.cpp")
+find_package(GTest CONFIG REQUIRED)
+target_link_libraries(OmnityEngineTest PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
+target_link_libraries(OmnityEngineTest PRIVATE Engine::Resources)
+add_test(AllTestsInMain OmnityEngineTest)

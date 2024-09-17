@@ -1,16 +1,16 @@
-﻿#include "OmnityTypes.h"
+﻿#include <Base/OmnityTypes.h>
 #include <vector>
-#include "Core.h"
-#include "Graphic.h"
-#include "Logger.h"
-#include "OmnityString.h"
+#include <Core/Core.h>
+#include <Graphic/Graphic.h>
+#include <Base/Logger.h>
+#include <Base/OmnityString.h>
 
 #include <chrono>
 #include <iostream>
 
 namespace Omnity::Core {
-	void Setup(const std::vector<String>& args) {
-		auto str = String(u"12🌹34");
+	void Setup(const std::vector<std::u16string>& args) {
+		auto str = std::u16string(u"12🌹34");
 		auto str2 = std::move(str);
 		auto str3 = str2;
 		Logger::LogInfo(str2);
@@ -23,15 +23,18 @@ namespace Omnity::Core {
 		Omnity::Graphic::SetupGraphicBackend();
 	}
 	void Application::Run(int argc, const char* argv[]) {
-		std::vector<String> args;
+		std::vector<std::u16string> args;
 		for (int i = 0; i < argc; ++i)
-			args.emplace_back(String(argv[i]));
+			args.emplace_back(std::u16string(StringUtils::FromUtf8Ptr(argv[i])));
 		Setup(args);
 	}
 	void Application::Run(int argc, const char16_t* argv[]) {
-		std::vector<String> args;
+		std::vector<std::u16string> args;
 		for (int i = 0; i < argc; ++i)
-			args.emplace_back(String(argv[i]));
+			args.emplace_back(std::u16string(argv[i]));
 		Setup(args);
+	}
+
+	Application::~Application() {
 	}
 }

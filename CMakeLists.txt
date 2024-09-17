@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.23)
+enable_testing()
 include("CMake/functions.cmake")
 
 find_program(FIND_CMAKE_CXX_CPPCHECK NAMES cppcheck)
@@ -18,7 +19,7 @@ else()
     message("set POSITION_INDEPENDENT_CODE to true")
 endif()
 
-project("OmnityEngine")
+project(OmnityEngine)
 if (MSVC)
     add_compile_options(/W4 /WX)
     add_link_options(/WX)

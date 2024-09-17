@@ -1,5 +1,8 @@
 # Base utils
-omnity_define_module()
+omnity_add_target(Base)
 
+target_sources(Base PRIVATE src/Logger.cpp src/OmnityString.cpp)
 find_package(utf8cpp CONFIG REQUIRED)
-omnity_module_link_libraries(utf8cpp::utf8cpp)
+find_package(fmt CONFIG REQUIRED)
+target_link_libraries(Base PRIVATE utf8cpp::utf8cpp)
+target_link_libraries(Base PUBLIC fmt::fmt)

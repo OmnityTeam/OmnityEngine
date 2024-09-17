@@ -1,4 +1,4 @@
-#include "Core.h"
+#include <Core/Core.h>
 #if WIN32
 #define OMNITY_API extern "C" __declspec(dllexport)
 #else

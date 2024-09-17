@@ -1,8 +1,8 @@
 #include <memory>
-#include "GraphicBackend.h"
-#include "Graphic.h"
+#include <GraphicBackend/GraphicBackend.h>
+#include <Graphic/Graphic.h>
 #ifdef GRAPHIC_BACKEND_VULKAN
-#include "VulkanBackend.h"
+#include <VulkanBackend/VulkanBackend.h>
 #endif
 
 namespace Omnity::Graphic {
@@ -31,7 +31,7 @@ namespace Omnity::Graphic {
 		Backend::RegisterGraphicBackend<VulkanBackend, Backend::Vulkan::VulkanBackend>();
 #endif
 #ifdef GRAPHIC_BACKEND_DX12
-		Backend::RegisterGraphicBackend<DX12Backend, Backend::Vulkan::DX12Backend>();
+		Backend::RegisterGraphicBackend<DX12Backend, Backend::DX12::DX12Backend>();
 #endif
 	}
 	bool SetupGraphicBackend(uint8_t id) {
