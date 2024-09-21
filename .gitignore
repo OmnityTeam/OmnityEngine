@@ -13,3 +13,4 @@ CMakeUserPresets.json
 CMakeSettings.json
 /out
 /.vs
+/.idea

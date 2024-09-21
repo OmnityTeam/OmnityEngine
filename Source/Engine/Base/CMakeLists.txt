@@ -1,7 +1,7 @@
 # Base utils
 omnity_add_target(Base)
 
-target_sources(Base PRIVATE src/Logger.cpp src/OmnityString.cpp)
+target_sources(Base PRIVATE "Src/logger.cpp" "Src/omnity_string.cpp")
 find_package(utf8cpp CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(stduuid CONFIG REQUIRED)

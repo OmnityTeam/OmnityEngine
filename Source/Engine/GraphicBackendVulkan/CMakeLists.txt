@@ -1,6 +1,6 @@
 # Graphic Backend Vulkan
 omnity_add_target(GraphicBackendVulkan)
-target_sources(GraphicBackendVulkan PRIVATE src/VulkanBackend.cpp)
+target_sources(GraphicBackendVulkan PRIVATE "Src/vulkan_backend.cpp")
 target_link_libraries(GraphicBackendVulkan PRIVATE GraphicBackend)
 
 find_package(Vulkan)
