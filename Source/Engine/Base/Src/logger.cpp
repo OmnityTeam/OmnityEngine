@@ -13,9 +13,8 @@ namespace omnity {
 #if WIN32
             WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), str.data(), static_cast<DWORD>(str.length()), nullptr, nullptr);
 #else
-            Words words(str);
-            for (const auto& word : words)
-                putwchar((wchar_t)word);
+			for (words words(str); auto word : words)
+				putwchar(static_cast<wchar_t>(word));
 #endif
         }
     public:
