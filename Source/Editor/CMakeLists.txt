@@ -1,2 +1,3 @@
 project(Editor)
-add_subdirectory(AssetImporter)
+add_subdirectory(ResourceDatabase)
+add_subdirectory(ResourceImporters)

@@ -5,12 +5,8 @@
 #include <fmt/format.h>
 
 namespace omnity {
-    class log_sink {
+    class log_sink : noncopyable {
     public:
-        log_sink(log_sink&) = delete;
-        log_sink(log_sink&&) = delete;
-        log_sink& operator =(log_sink& str) = delete;
-        log_sink& operator =(log_sink&& str) = delete;
         log_sink() = default;
         virtual void log(std::u16string_view category, std::u16string_view message) = 0;
         virtual ~log_sink() = default;

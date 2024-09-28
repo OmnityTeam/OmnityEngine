@@ -21,6 +21,10 @@ namespace omnity::core {
             logger::log_info(arg);
         omnity::graphic::init_graphic();
         omnity::graphic::setup_graphic_backend();
+
+		int a;
+		std::cin >> a;
+		auto ptr = omnity::type_instantiate(a);
     }
     void application::run(const int argc, const char* argv[]) {
         std::vector<std::u16string> args;

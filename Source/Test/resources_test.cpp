@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
-#include <resources/resources_manager.h>
-#include <resources/texture.h>
+#include <graphic/texture.h>
+#include <base/omnity_types.h>
+
+TEST(resource, serialize) {
+	omnity::texture tex(1, 2);
+}
 
 TEST(resource, register_and_get) {
     /*Omnity::ResourcesManager::Initialize();

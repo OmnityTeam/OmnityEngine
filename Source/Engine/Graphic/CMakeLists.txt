@@ -6,6 +6,8 @@ target_link_libraries(Graphic PRIVATE GraphicBackend)
 set(GRAPHIC_USE_VULKAN ON CACHE BOOL "Enable Vulkan support?")
 set(GRAPHIC_USE_DX12 OFF CACHE BOOL "Enable DX12 support?")
 
+target_link_libraries(Graphic PRIVATE Base)
+
 if ($CACHE{GRAPHIC_USE_VULKAN})
 	message("Enable Vulkan support")
 	target_link_libraries(Graphic PRIVATE GraphicBackendVulkan)

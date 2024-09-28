@@ -1,5 +1,11 @@
 #pragma once
 
+#include <graphic/texture.h>
+#include <graphic/material.h>
+#include <graphic/mesh.h>
+#include <graphic/shader.h>
+#include <graphic/particle.h>
+
 namespace omnity::graphic {
     constexpr int unknown_backend = 0;
     constexpr int vulkan_backend = 1;

@@ -1,5 +1,7 @@
 #pragma once
-#include <stduuid/uuid.h>
-namespace omnity {
 
+namespace omnity {
+	class text_asset {
+
+	};
 }

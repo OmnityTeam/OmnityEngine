@@ -5,6 +5,6 @@
     "utfcpp",
     "fmt",
     "gtest",
-    "stduuid"
+    "cereal"
   ]
 }
