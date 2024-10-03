@@ -1,6 +1,6 @@
 # This starter workflow is for a CMake project running on a single platform. There is a different starter workflow if you need cross-platform coverage.
 # See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-multi-platform.yml
-name: Desktop
+name: Android
 
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
     - name: Build CMake
       uses: lukka/run-cmake@v10
       with:
-        configurePreset: 'android'
+        configurePreset: 'android-arm64-v8a'
         configurePresetAdditionalArgs: "['-DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}', '-DCMAKE_C_COMPILER=${{ matrix.c_compiler }}']"
         buildPreset: 'android-arm64-v8a-release'
         buildPresetAdditionalArgs: "[]"
