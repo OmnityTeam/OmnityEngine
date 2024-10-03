@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.23)
 enable_testing()
 if (VCPKG_TARGET_ANDROID)
-    include("cmake/vcpkg_android.cmake")
+    include("CMake/vcpkg_android.cmake")
 endif()
 include("CMake/functions.cmake")
 

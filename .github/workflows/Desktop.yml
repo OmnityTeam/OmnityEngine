@@ -19,7 +19,6 @@ jobs:
       fail-fast: false
       matrix: 
         os: [windows-latest, ubuntu-latest]
-        build_type: [Release]
         c_compiler: [gcc, clang-18, cl]
         include:
           - os: windows-latest
@@ -74,8 +73,8 @@ jobs:
       with:
         configurePreset: 'desktop'
         configurePresetAdditionalArgs: "['-DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}', '-DCMAKE_C_COMPILER=${{ matrix.c_compiler }}']"
-        buildPreset: 'desktop'
-        buildPresetAdditionalArgs: "['--config ${{ matrix.build_type }}']"
+        buildPreset: 'desktop-release'
+        buildPresetAdditionalArgs: "[]"
         testPreset: 'ninja-multi-vcpkg-test-release'
         testPresetAdditionalArgs: "[]"
 
