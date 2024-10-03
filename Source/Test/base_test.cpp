@@ -22,7 +22,7 @@ TEST(base, type_system) {
 		a = type_metadata->try_get_field(first_field->name);
 	}
 	auto stop = std::chrono::steady_clock::now();
-	GTEST_LOG_(INFO) << stop - start;
+	GTEST_LOG_(INFO) << static_cast<double>(duration_cast<std::chrono::nanoseconds>(stop - start).count()) / 1e6 << "ms 1000000 times";
 	GTEST_LOG_(INFO) << a;
 	//omnity::type_serializer<omnity::type_id<omnity::texture>>::type_instance_load(ar, 1920, 1080);
 }
