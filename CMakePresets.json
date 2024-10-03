@@ -21,7 +21,6 @@
       "description": "Build for desktop",
       "inherits": "ninja-multi-vcpkg",
       "cacheVariables": {
-        "OMNITY_HAS_TEST": true,
         "GRAPHIC_USE_VULKAN": true,
         "GRAPHIC_USE_DX12": false
       }
@@ -100,13 +99,13 @@
   "testPresets": [
     {
       "name": "ninja-multi-vcpkg-test",
-      "configurePreset": "ninja-multi-vcpkg",
+      "configurePreset": "desktop",
       "displayName": "Test ninja-multi-vcpkg",
       "description": "Test Debug configuration"
     },
     {
       "name": "ninja-multi-vcpkg-test-release",
-      "configurePreset": "ninja-multi-vcpkg",
+      "inherits": "ninja-multi-vcpkg-test",
       "displayName": "Test ninja-multi-vcpkg-release",
       "description": "Test Release configuration",
       "configuration": "Release"
