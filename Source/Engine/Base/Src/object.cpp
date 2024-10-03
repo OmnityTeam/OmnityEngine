@@ -1,3 +1,4 @@
+#include <exception>
 #include "base/object.h"
 
 namespace {

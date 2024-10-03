@@ -39,7 +39,7 @@ namespace omnity {
 	};
 	class resource_ref {
 	private:
-		resource_ref_ctrl_block* ctrl_;
+		[[maybe_unused]]resource_ref_ctrl_block* ctrl_;
     };
 	template <typename TRes, typename... TArgs>
 	resource_ref make_resource(TArgs... args) {
