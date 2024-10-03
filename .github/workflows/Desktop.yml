@@ -29,8 +29,8 @@ jobs:
             c_compiler: gcc
             cpp_compiler: g++
           - os: ubuntu-latest
-            c_compiler: clang
-            cpp_compiler: clang++
+            c_compiler: clang-18
+            cpp_compiler: clang++-18
         exclude:
           - os: windows-latest
             c_compiler: gcc
@@ -69,4 +69,6 @@ jobs:
         configurePresetAdditionalArgs: "['-DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}', '-DCMAKE_C_COMPILER=${{ matrix.c_compiler }}']"
         buildPreset: 'ninja-multi-vcpkg'
         buildPresetAdditionalArgs: "['--config ${{ matrix.build_type }}']"
+        testPreset: 'ninja-multi-vcpkg'
+        testPresetAdditionalArgs: "['--config ${{ matrix.build_type }}']"
 
