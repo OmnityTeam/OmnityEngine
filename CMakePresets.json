@@ -45,5 +45,20 @@
       "description": "Build Release configuration",
       "configuration": "Release"
     }
+  ],
+  "testPresets": [
+    {
+      "name": "ninja-multi-vcpkg-test",
+      "configurePreset": "ninja-multi-vcpkg",
+      "displayName": "Test ninja-multi-vcpkg",
+      "description": "Test Debug configuration"
+    },
+    {
+      "name": "ninja-multi-vcpkg-test-release",
+      "configurePreset": "ninja-multi-vcpkg",
+      "displayName": "Test ninja-multi-vcpkg-release",
+      "description": "Test Release configuration",
+      "configuration": "Release"
+    }
   ]
 }
