@@ -3,6 +3,11 @@
 
 namespace omnity {
 	class texture {
+	public:
+		METADATA_BEGIN(texture)
+			FIELD(w_)
+			FIELD(h_)
+		METADATA_END()
 	private:
 		uint32_t w_, h_;
 	public:
@@ -22,10 +27,5 @@ namespace omnity {
 			ar& h_;
 		}
 	};
-	DEFINE_CTOR(texture) {
-		return std::make_any<texture>();
-	}
-	ENABLE_SERIALIZE(texture, BinaryOutputArchive);
-	ENABLE_DESERIALIZE(texture, BinaryInputArchive);
-	
+	DEFINE_TYPE(texture);
 }

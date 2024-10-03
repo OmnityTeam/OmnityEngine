@@ -4,18 +4,8 @@
 namespace omnity {
 	class particle {
 	public:
-		template <class Archive>
-		void save([[maybe_unused]] Archive& ar) const
-		{
-		}
-		template <class Archive>
-		void load([[maybe_unused]] Archive& ar)
-		{
-		}
+		METADATA_BEGIN(particle)
+		METADATA_END()
 	};
-	DEFINE_CTOR(particle) {
-		return std::make_any<particle>();
-	}
-	ENABLE_SERIALIZE(particle, BinaryOutputArchive);
-	ENABLE_DESERIALIZE(particle, BinaryInputArchive);
+	DEFINE_TYPE(particle);
 }
