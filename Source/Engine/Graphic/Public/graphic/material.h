@@ -7,5 +7,4 @@ namespace omnity {
 		METADATA_BEGIN(material)
 		METADATA_END()
 	};
-	DEFINE_TYPE(material);
 }

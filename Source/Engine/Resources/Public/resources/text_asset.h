@@ -6,5 +6,4 @@ namespace omnity {
 		METADATA_BEGIN(text_asset)
 		METADATA_END()
 	};
-	DEFINE_TYPE(text_asset);
 }

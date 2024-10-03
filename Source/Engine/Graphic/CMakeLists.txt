@@ -1,6 +1,6 @@
 # Graphic
 omnity_add_target(Graphic)
-target_sources(Graphic PRIVATE "Src/graphic.cpp")
+target_sources(Graphic PRIVATE "Src/graphic.cpp" "Src/material.cpp" "Src/mesh.cpp" "Src/particle.cpp" "Src/shader.cpp" "Src/texture.cpp")
 target_link_libraries(Graphic PRIVATE GraphicBackend)
 
 set(GRAPHIC_USE_VULKAN ON CACHE BOOL "Enable Vulkan support?")

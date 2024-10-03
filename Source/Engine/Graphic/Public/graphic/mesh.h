@@ -7,5 +7,4 @@ namespace omnity {
 		METADATA_BEGIN(mesh)
 		METADATA_END()
 	};
-	DEFINE_TYPE(mesh);
 }

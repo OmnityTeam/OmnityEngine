@@ -44,7 +44,7 @@ template <>\
 inline const type_metadata* type_metadata_ptr<NAME> = &GET_METADATA_GLOBAL_FUNC_NAME(NAME)()
 
 #define DEFINE_TYPE(TYPE_NAME)\
-inline const type_metadata& GET_METADATA_GLOBAL_FUNC_NAME(TYPE_NAME)() {\
+const type_metadata& GET_METADATA_GLOBAL_FUNC_NAME(TYPE_NAME)() {\
 	return TYPE_NAME::GET_METADATA_FUNC_NAME();\
 }\
 

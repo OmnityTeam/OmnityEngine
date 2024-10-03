@@ -7,5 +7,4 @@ namespace omnity {
 		METADATA_BEGIN(particle)
 		METADATA_END()
 	};
-	DEFINE_TYPE(particle);
 }

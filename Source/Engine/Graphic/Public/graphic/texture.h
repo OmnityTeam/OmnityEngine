@@ -27,5 +27,4 @@ namespace omnity {
 			ar& h_;
 		}
 	};
-	DEFINE_TYPE(texture);
 }

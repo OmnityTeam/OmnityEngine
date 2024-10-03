@@ -7,5 +7,4 @@ namespace omnity {
 		METADATA_BEGIN(shader)
 		METADATA_END()
 	};
-	DEFINE_TYPE(shader);
 }
