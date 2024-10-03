@@ -1,3 +1,4 @@
 # Core
-omnity_define_module()
-omnity_module_dependencies(Base Graphic Logger)
+omnity_add_target(Core)
+target_sources(Core PRIVATE "Src/application.cpp")
+target_link_libraries(Core Base Graphic Resources)

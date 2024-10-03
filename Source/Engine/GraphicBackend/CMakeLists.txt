@@ -1,2 +1,3 @@
 # Graphic Backend
-omnity_define_module()
+omnity_add_target(GraphicBackend)
+target_sources(GraphicBackend PRIVATE "Src/graphic_backend.cpp")

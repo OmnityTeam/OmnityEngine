@@ -1,0 +1,3 @@
+project(Editor)
+add_subdirectory(ResourceDatabase)
+add_subdirectory(ResourceImporters)

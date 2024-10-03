@@ -1,7 +1,8 @@
 # Graphic Backend Vulkan
-omnity_define_module()
-omnity_module_dependencies(GraphicBackend)
+omnity_add_target(GraphicBackendVulkan)
+target_sources(GraphicBackendVulkan PRIVATE "Src/vulkan_backend.cpp")
+target_link_libraries(GraphicBackendVulkan PRIVATE GraphicBackend)
 
 find_package(Vulkan)
 find_package(VulkanMemoryAllocator CONFIG REQUIRED)
-omnity_module_link_libraries(Vulkan::Vulkan GPUOpen::VulkanMemoryAllocator)
+target_link_libraries(GraphicBackendVulkan PRIVATE Vulkan::Vulkan GPUOpen::VulkanMemoryAllocator)
