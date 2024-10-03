@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "omnity_types.h"
+#include <base/types.h>
 #include <fmt/format.h>
 
 namespace omnity {

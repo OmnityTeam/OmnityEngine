@@ -1,9 +1,9 @@
-#include <base/omnity_types.h>
+#include <base/types.h>
 #include <vector>
 #include <core/core.h>
 #include <graphic/graphic.h>
 #include <base/logger.h>
-#include <base/omnity_string.h>
+#include <base/string_utils.h>
 
 #include <chrono>
 #include <iostream>
@@ -21,10 +21,6 @@ namespace omnity::core {
             logger::log_info(arg);
         omnity::graphic::init_graphic();
         omnity::graphic::setup_graphic_backend();
-
-		int a;
-		std::cin >> a;
-		auto ptr = omnity::type_instantiate(a);
     }
     void application::run(const int argc, const char* argv[]) {
         std::vector<std::u16string> args;

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <graphic/graphic.h>
 #include <base/scene.h>
-#include <base/omnity_types.h>
+#include <base/types.h>
 #include <cereal/archives/binary.hpp>
 
 template <typename... TArgs>

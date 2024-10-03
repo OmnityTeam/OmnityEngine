@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <graphic/texture.h>
-#include <base/omnity_types.h>
+#include <base/types.h>
 
 TEST(resource, serialize) {
 	omnity::texture tex(1, 2);

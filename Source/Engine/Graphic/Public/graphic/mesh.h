@@ -1,5 +1,5 @@
 #pragma once
-#include <base/internal_types.h>
+#include <base/types.h>
 
 namespace omnity {
 	class mesh {

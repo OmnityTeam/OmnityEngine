@@ -1,6 +1,6 @@
 #pragma once
-#include <base/omnity_string.h>
-#include <base/internal_types.h>
+#include <base/string_utils.h>
+#include <base/object.h>
 #include <source_location>
 
 namespace omnity {

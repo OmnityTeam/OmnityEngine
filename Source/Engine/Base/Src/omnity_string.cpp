@@ -1,7 +1,7 @@
 #ifdef WIN32
 #include <Windows.h>
 #endif
-#include <base/omnity_string.h>
+#include <base/string_utils.h>
 #include <utf8.h>
 #include <iterator>
 
