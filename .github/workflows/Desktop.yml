@@ -72,9 +72,9 @@ jobs:
     - name: Build CMake
       uses: lukka/run-cmake@v10
       with:
-        configurePreset: 'ninja-multi-vcpkg'
+        configurePreset: 'desktop'
         configurePresetAdditionalArgs: "['-DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}', '-DCMAKE_C_COMPILER=${{ matrix.c_compiler }}']"
-        buildPreset: 'ninja-multi-vcpkg'
+        buildPreset: 'desktop'
         buildPresetAdditionalArgs: "['--config ${{ matrix.build_type }}']"
         testPreset: 'ninja-multi-vcpkg-test-release'
         testPresetAdditionalArgs: "[]"
