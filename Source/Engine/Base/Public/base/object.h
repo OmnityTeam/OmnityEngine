@@ -130,7 +130,7 @@ namespace omnity {
 		constexpr const type_metadata* get_type_metadata() const {
 			return get_type_metadata_by_index(type_index<T>);
 		}
-		const type_metadata* get_type_metadata_by_id(int type_id) const;
+		const type_metadata* try_get_type_metadata_by_id(int type_id) const;
 		const type_metadata* get_type_metadata_by_index(int type_index) const;
 	};
 	const type_table* get_type_table();

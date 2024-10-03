@@ -28,9 +28,9 @@ namespace omnity{
 	const type_metadata* type_table::get_type_metadata_by_index(int type_index) const {
 		return type_cache[type_index];
 	}
-	const type_metadata* type_table::get_type_metadata_by_id(int type_id) const {
+	const type_metadata* type_table::try_get_type_metadata_by_id(int type_id) const {
 		const auto ret = type_map.find(type_id);
-		if (ret == type_map.end()) throw std::exception("Unknown type");
+		if (ret == type_map.end()) return nullptr;
 		return type_cache[ret->second];
 	}
 }
