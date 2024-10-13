@@ -1,4 +1,4 @@
-#include <resources/resources_manager.h>
+#include <resources/resources.h>
 #include <resources/text_asset.h>
 
 namespace omnity {
