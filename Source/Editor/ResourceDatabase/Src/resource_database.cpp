@@ -1,3 +1,4 @@
+#include <sstream>
 #include <resource_database/resource_database.h>
 
 namespace omnity {
