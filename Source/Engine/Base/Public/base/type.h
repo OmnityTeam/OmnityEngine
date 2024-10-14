@@ -40,17 +40,17 @@ const type_metadata& GET_METADATA_GLOBAL_FUNC_NAME(TYPE_NAME)() {\
 namespace omnity {
 	// Type definitions
 	template <typename T>
-	constexpr inline type_id_t type_id = []() constexpr { static_assert("Unknown type"); };
+	constexpr inline type_id_t type_id = []() constexpr { static_assert("Unknown type"); return std::numeric_limits<type_id_t>::max(); };
 	template <typename T>
-	constexpr inline size_t type_index = []() constexpr { static_assert("Unknown type"); };
+	constexpr inline size_t type_index = []() constexpr { static_assert("Unknown type"); return std::numeric_limits<size_t>::max(); };
 	template <typename T>
 	inline const type_metadata* type_metadata_ptr = nullptr;
 	template <size_t Index>
-	constexpr inline type_id_t type_id_by_index = []() constexpr { static_assert("Unknown type"); };
+	constexpr inline type_id_t type_id_by_index = []() constexpr { static_assert("Unknown type"); return std::numeric_limits<type_id_t>::max(); };
 	template <size_t Index>
 	inline const type_metadata* type_metadata_ptr_by_index = nullptr;
 	template <type_id_t Id>
-	constexpr inline size_t type_index_by_id = []() constexpr { static_assert("Unknown type"); };
+	constexpr inline size_t type_index_by_id = []() constexpr { static_assert("Unknown type"); return std::numeric_limits<size_t>::max(); };
 	template <type_id_t Id>
 	inline const type_metadata* type_metadata_ptr_by_id = nullptr;
 	template <uint_least32_t Line>
@@ -102,5 +102,12 @@ namespace omnity {
 		const type_metadata* try_get_type_metadata_by_id(type_id_t type_id) const;
 		const type_metadata* get_type_metadata_by_index(size_t type_index) const;
 	};
-	const type_table* get_type_table();
+	inline const type_table* get_type_table() {
+		static type_table type_table;
+		return &type_table;
+	}
+
+	inline const type_metadata* field_metadata::get_type_metadata() const {
+		return get_type_table()->get_type_metadata_by_index(field_type_index);
+	}
 }

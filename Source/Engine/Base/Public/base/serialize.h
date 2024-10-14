@@ -15,7 +15,13 @@ static const ::omnity::type_metadata& GET_METADATA_FUNC_NAME() {\
 		{
 
 #define FIELD(FIELD_NAME) \
-{::omnity::field_metadata(u""#FIELD_NAME, field_index++, get_field_type_id<decltype(__this_type::FIELD_NAME)>(), ::omnity::is_array_v<decltype(__this_type::FIELD_NAME)>, offsetof(__this_type, FIELD_NAME))},
+{::omnity::field_metadata(\
+	u""#FIELD_NAME,\
+	field_index++,\
+	get_field_type_id<decltype(__this_type::FIELD_NAME)>(),\
+	get_field_type_index<decltype(__this_type::FIELD_NAME)>(),\
+	::omnity::is_array_v<decltype(__this_type::FIELD_NAME)>,\
+	offsetof(__this_type, FIELD_NAME))},
 
 #define METADATA_END() \
 }); return meta; }
@@ -33,6 +39,13 @@ namespace omnity {
 			return type_id<typename T::value_type>;
 		else
 			return type_id<T>;
+	}
+	template<typename T>
+	constexpr type_id_t get_field_type_index() {
+		if constexpr (is_array_v<T>)
+			return type_index<typename T::value_type>;
+		else
+			return type_index<T>;
 	}
 	struct serialize_ctx {
 		using begin_object_f = void(*)();

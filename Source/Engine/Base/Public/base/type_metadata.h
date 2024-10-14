@@ -58,14 +58,15 @@ namespace omnity {
 		const std::u16string_view name;
 		const field_id_t field_id;
 		const type_id_t field_type_id;
+		const size_t field_type_index;
 		const size_t offset;
 		const bool is_array;
-		constexpr field_metadata(const std::u16string_view n, const field_id_t id, const type_id_t type_id, const bool is_array, const size_t off)
-			: name(n), field_id(id), field_type_id(type_id), offset(off), is_array(is_array) {}
+		constexpr field_metadata(const std::u16string_view n, const field_id_t id, const type_id_t type_id, const type_id_t type_index, const bool is_array, const size_t off)
+			: name(n), field_id(id), field_type_id(type_id), field_type_index(type_index), offset(off), is_array(is_array) {}
 		const type_metadata* get_type_metadata() const;
 	};
 	class type_metadata {
-		std::vector<field_metadata> fields_;
+		const std::vector<field_metadata> fields_;
 		std::map<std::u16string_view, field_id_t> field_map_;
 	public:
 		const std::u16string_view name;

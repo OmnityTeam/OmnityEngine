@@ -31,10 +31,6 @@ namespace {
 	}
 }
 namespace omnity{
-	const type_table* get_type_table() {
-		static type_table type_table;
-		return &type_table;
-	}
 	type_table::type_table() {
 		build_type_cache();
 		build_type_map();
@@ -46,9 +42,6 @@ namespace omnity{
 		const auto ret = type_map.find(type_id);
 		if (ret == type_map.end()) return nullptr;
 		return type_cache[ret->second];
-	}
-	const type_metadata* field_metadata::get_type_metadata() const {
-		return get_type_table()->try_get_type_metadata_by_id(field_type_id);
 	}
 	DEFINE_BASIC_TYPE(int);
 	DEFINE_BASIC_TYPE(bool);
