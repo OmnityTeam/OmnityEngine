@@ -11,7 +11,7 @@ const type_metadata& GET_METADATA_GLOBAL_FUNC_NAME(TYPE_NAME)() {\
 		::omnity::serializer_t(\
 			[](serialize_ctx* ctx, void* ptr) { omnity::serialize<TYPE_NAME>(*ctx, *reinterpret_cast<TYPE_NAME*>(ptr)); }),\
 		::omnity::create_vector_impl<TYPE_NAME>(),\
-		{}, 0);\
+		{});\
 	return meta;\
 }\
 

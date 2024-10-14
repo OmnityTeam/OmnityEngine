@@ -6,7 +6,7 @@
 #endif
 
 OMNITY_API int omnity_main(const int argc, const char* argv[]) {
-    omnity::core::application::run(argc, argv);
+	omnity::core::application::run(argc, argv);
     return 0;
 }
 

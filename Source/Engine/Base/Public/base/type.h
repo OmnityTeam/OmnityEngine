@@ -5,6 +5,7 @@
 #include <vector>
 #include <ranges>
 #include <cassert>
+#include <numeric>
 #include <base/type_metadata.h>
 
 #define GET_METADATA_FUNC_NAME get_metadata
@@ -15,19 +16,19 @@ const type_metadata& GET_METADATA_GLOBAL_FUNC_NAME(NAME)();\
 template <>\
 constexpr inline size_t type_count_before<std::source_location::current().line()> = type_count_before<std::source_location::current().line() - 1> + 1;\
 template <>\
+inline const type_metadata* type_metadata_ptr_by_id<ID> = &GET_METADATA_GLOBAL_FUNC_NAME(NAME)(); \
+template <>\
+inline const type_metadata* type_metadata_ptr_by_index<type_count_before<std::source_location::current().line()> - 1> = &GET_METADATA_GLOBAL_FUNC_NAME(NAME)();\
+template <>\
+inline const type_metadata* type_metadata_ptr<NAME> = &GET_METADATA_GLOBAL_FUNC_NAME(NAME)();\
+template <>\
 constexpr inline type_id_t type_id<NAME> = ID;\
 template <>\
 constexpr inline size_t type_index<NAME> = type_count_before<std::source_location::current().line()> - 1;\
 template <>\
 constexpr inline type_id_t type_id_by_index<type_index<NAME>> = type_id<NAME>;\
 template <>\
-constexpr inline size_t type_index_by_id<type_id<NAME>> = type_index<NAME>;\
-template <>\
-inline const type_metadata* type_metadata_ptr_by_id<type_id<NAME>> = &GET_METADATA_GLOBAL_FUNC_NAME(NAME)();\
-template <>\
-inline const type_metadata* type_metadata_ptr_by_index<type_index<NAME>> = &GET_METADATA_GLOBAL_FUNC_NAME(NAME)();\
-template <>\
-inline const type_metadata* type_metadata_ptr<NAME> = &GET_METADATA_GLOBAL_FUNC_NAME(NAME)()
+constexpr inline size_t type_index_by_id<type_id<NAME>> = type_index<NAME>;
 
 #define DECLARE_TYPE(NAME, ID)\
 class NAME;\
@@ -41,19 +42,19 @@ const type_metadata& GET_METADATA_GLOBAL_FUNC_NAME(TYPE_NAME)() {\
 namespace omnity {
 	// Type definitions
 	template <typename T>
-	constexpr inline type_id_t type_id = []() constexpr { static_assert(false, "Unknown type"); };
-	template <typename T>
-	constexpr inline size_t type_index = []() constexpr { static_assert(false, "Unknown type"); };
-	template <typename T>
 	inline const type_metadata* type_metadata_ptr = nullptr;
-	template <size_t Index>
-	constexpr inline type_id_t type_id_by_index = []() constexpr { static_assert(false, "Unknown type"); };
+	template <typename T>
+	constexpr inline type_id_t type_id = []() constexpr { static_assert(type_metadata_ptr<T> != nullptr, "Unknown type"); };
+	template <typename T>
+	constexpr inline size_t type_index = []() constexpr { static_assert(type_metadata_ptr<T> != nullptr, "Unknown type"); };
 	template <size_t Index>
 	inline const type_metadata* type_metadata_ptr_by_index = nullptr;
-	template <type_id_t Id>
-	constexpr inline size_t type_index_by_id = []() constexpr { static_assert(false, "Unknown type"); };
+	template <size_t Index>
+	constexpr inline type_id_t type_id_by_index = []() constexpr { static_assert(type_metadata_ptr_by_index<Index> != nullptr, "Unknown type"); };
 	template <type_id_t Id>
 	inline const type_metadata* type_metadata_ptr_by_id = nullptr;
+	template <type_id_t Id>
+	constexpr inline size_t type_index_by_id = []() constexpr { static_assert(type_metadata_ptr_by_id<Id> != nullptr, "Unknown type"); };
 	template <uint_least32_t Line>
 	constexpr inline size_t type_count_before = type_count_before<Line - 1>;
 	template <>

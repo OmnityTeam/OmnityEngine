@@ -75,8 +75,8 @@ namespace omnity {
 		const type_id_t type_id;
 		const serializer_t serializer;
 		const vector_impl_t vector_impl;
-		type_metadata(const std::u16string_view n, const size_t type_index, const type_id_t id, const serializer_t& s, const vector_impl_t& vector_impl, const field_metadata* field_array, const size_t field_count)
-			: fields_(field_array, field_array + field_count), name(n), runtime_type_index(type_index), type_id(id), serializer(s), vector_impl(vector_impl) {
+		type_metadata(const std::u16string_view n, const size_t type_index, const type_id_t id, const serializer_t& s, const vector_impl_t& vector_impl, const std::initializer_list<field_metadata> f)
+			: fields_(f), name(n), runtime_type_index(type_index), type_id(id), serializer(s), vector_impl(vector_impl) {
 			auto kvp = std::views::transform(
 				fields_,
 				[](const field_metadata& meta) { return std::make_pair(meta.name, meta.field_id); });

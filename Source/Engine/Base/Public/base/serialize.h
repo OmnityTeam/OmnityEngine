@@ -9,7 +9,7 @@
 static const ::omnity::type_metadata& GET_METADATA_FUNC_NAME() {\
 	using __this_type = TYPE_NAME;\
 	constexpr std::u16string_view __type_name = u""#TYPE_NAME;\
-	omnity::field_id_t __field_count = 0;\
+	[[maybe_unused]] omnity::field_id_t __field_count = 0;\
 	const omnity::field_metadata __fields[]{
 
 #define FIELD(FIELD_NAME) \
@@ -34,7 +34,7 @@ static ::omnity::type_metadata meta(__type_name, ::omnity::type_index<__this_typ
 	::omnity::serializer_t(\
 		[](serialize_ctx* ctx, void* ptr) { ::omnity::serialize<__this_type>(*ctx, *reinterpret_cast<__this_type*>(ptr)); }), \
 	::omnity::create_vector_impl<__this_type>(),\
-	__fields, __field_count); \
+	std::initializer_list(std::begin(__fields), std::end(__fields)-1)); \
 return meta; }
 
 namespace omnity {
