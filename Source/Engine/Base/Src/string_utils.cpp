@@ -19,15 +19,15 @@ namespace omnity::string_utils
         }
         return ret;
     }
-    std::u16string from_utf8(const std::string& str) {
+    std::u16string from_utf8(const std::string_view& str) {
         std::u16string ret;
         utf8::utf8to16(str.begin(), str.end(), std::back_inserter(ret));
         return ret;
     }
-    std::string to_utf8(const std::u16string& str) {
-        std::string ret;
-        utf8::utf16to8(str.begin(), str.end(), std::back_inserter(ret));
-        return ret;
+	std::string to_utf8(const std::u16string_view& str) {
+		std::string ret;
+		utf8::utf16to8(str.begin(), str.end(), std::back_inserter(ret));
+		return ret;
     }
     template <typename TIter>
     inline char32_t next_char(TIter& iter, TIter end) {

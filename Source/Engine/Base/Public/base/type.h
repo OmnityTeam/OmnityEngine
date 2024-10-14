@@ -1,27 +1,13 @@
 #pragma once
-#include <any>
 #include <array>
 #include <source_location>
 #include <map>
-#include <typeindex>
-#include <ankerl/unordered_dense.h>
+#include <vector>
 #include <ranges>
-#include <algorithm>
+#include <base/type_metadata.h>
 
 #define GET_METADATA_FUNC_NAME get_metadata
 #define GET_METADATA_GLOBAL_FUNC_NAME(TYPE_NAME) __get_class_##TYPE_NAME##_metadata
-
-#define METADATA_BEGIN(TYPE_NAME)\
-static const ::omnity::type_metadata& GET_METADATA_FUNC_NAME() {\
-	using __this_type = TYPE_NAME;\
-	static_assert(type_id<__this_type> != std::numeric_limits<type_id_t>::max(), "Type is not registered in object.h");\
-	[[maybe_unused]] field_id_t field_index = 0;\
-	static ::omnity::type_metadata meta(u""#TYPE_NAME, ::omnity::type_index<__this_type>, ::omnity::type_id<__this_type>, {
-#define FIELD(FIELD_NAME) \
-{::omnity::field_metadata(u""#FIELD_NAME, field_index++, type_id<decltype(__this_type::FIELD_NAME)>, offsetof(__this_type, FIELD_NAME))},
-
-#define METADATA_END() \
-}); return meta; }
 
 #define DECLARE_BASIC_TYPE(NAME, ID)\
 const type_metadata& GET_METADATA_GLOBAL_FUNC_NAME(NAME)();\
@@ -46,74 +32,25 @@ inline const type_metadata* type_metadata_ptr<NAME> = &GET_METADATA_GLOBAL_FUNC_
 class NAME;\
 DECLARE_BASIC_TYPE(NAME, ID)
 
-#define DEFINE_BASIC_TYPE(TYPE_NAME)\
-const type_metadata& GET_METADATA_GLOBAL_FUNC_NAME(TYPE_NAME)() {\
-	static type_metadata meta(u""#TYPE_NAME, ::omnity::type_index<TYPE_NAME>, ::omnity::type_id<TYPE_NAME>, {});\
-	return meta;\
-}\
-
 #define DEFINE_TYPE(TYPE_NAME)\
 const type_metadata& GET_METADATA_GLOBAL_FUNC_NAME(TYPE_NAME)() {\
 	return TYPE_NAME::GET_METADATA_FUNC_NAME();\
 }\
 
 namespace omnity {
-	// Type metadata
-	using field_id_t = uint32_t;
-	using type_id_t = uint32_t;
-	class field_metadata;
-	class type_metadata;
-	class field_metadata {
-		friend class type_metadata;
-	public:
-		const std::u16string_view name;
-		const field_id_t field_id;
-		const type_id_t field_type_id;
-		const size_t offset;
-		constexpr field_metadata(const std::u16string_view n, const field_id_t id, const type_id_t type_id, const size_t off)
-			: name(n), field_id(id), field_type_id(type_id), offset(off) {}
-		const type_metadata* get_type_metadata() const;
-	};
-	class type_metadata {
-		std::vector<field_metadata> fields_;
-		std::map<std::u16string_view, field_id_t> field_map_;
-	public:
-		const std::u16string_view name;
-		const size_t runtime_type_index;
-		const type_id_t type_id;
-		type_metadata(const std::u16string_view n, const size_t type_index, const type_id_t id, const std::initializer_list<field_metadata> f)
-			: fields_(f), name(n), runtime_type_index(type_index), type_id(id) {
-			auto kvp = std::views::transform(
-				fields_,
-				[](const field_metadata& meta) { return std::make_pair(meta.name, meta.field_id); });
-			field_map_ = std::map(kvp.begin(), kvp.end());
-		}
-		const field_metadata* get_field(const field_id_t field_id) const {
-			return &fields_[field_id];
-		}
-		const field_metadata* try_get_field(const std::u16string_view field_name) const {
-			const auto ret = field_map_.find(field_name);
-			if (ret == field_map_.end()) return nullptr;
-			return &fields_[ret->second];
-		}
-		const std::vector<field_metadata>& get_fields() const {
-			return fields_;
-		}
-	};
-
 	// Type definitions
 	template <typename T>
-	constexpr inline type_id_t type_id = std::numeric_limits<type_id_t>::max();
+	constexpr inline type_id_t type_id = []() constexpr { static_assert("Unknown type"); };
 	template <typename T>
-	constexpr inline size_t type_index = std::numeric_limits<size_t>::max();
+	constexpr inline size_t type_index = []() constexpr { static_assert("Unknown type"); };
 	template <typename T>
 	inline const type_metadata* type_metadata_ptr = nullptr;
 	template <size_t Index>
-	constexpr inline type_id_t type_id_by_index = std::numeric_limits<type_id_t>::max();
+	constexpr inline type_id_t type_id_by_index = []() constexpr { static_assert("Unknown type"); };
 	template <size_t Index>
 	inline const type_metadata* type_metadata_ptr_by_index = nullptr;
 	template <type_id_t Id>
-	constexpr inline size_t type_index_by_id = std::numeric_limits<size_t>::max();
+	constexpr inline size_t type_index_by_id = []() constexpr { static_assert("Unknown type"); };
 	template <type_id_t Id>
 	inline const type_metadata* type_metadata_ptr_by_id = nullptr;
 	template <uint_least32_t Line>
@@ -136,6 +73,9 @@ namespace omnity {
 	DECLARE_BASIC_TYPE(double, 11);
 	using serializable_u16string_view = std::u16string_view;
 	DECLARE_BASIC_TYPE(serializable_u16string_view, 12);
+
+	// basic types
+	DECLARE_TYPE(binary_block_t, 101);
 
 	// basic asset
 	DECLARE_TYPE(scene, 1001);

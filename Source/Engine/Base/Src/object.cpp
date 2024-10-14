@@ -1,5 +1,19 @@
 #include <exception>
-#include "base/object.h"
+#include <base/type.h>
+#include <base/serialize.h>
+
+#define DEFINE_BASIC_TYPE(TYPE_NAME)\
+const type_metadata& GET_METADATA_GLOBAL_FUNC_NAME(TYPE_NAME)() {\
+	static type_metadata meta(\
+		u""#TYPE_NAME,\
+		::omnity::type_index<TYPE_NAME>,\
+		::omnity::type_id<TYPE_NAME>,\
+		::omnity::serializer_t(\
+			[](serialize_ctx* ctx, void* ptr) { omnity::serialize<TYPE_NAME>(*ctx, *reinterpret_cast<TYPE_NAME*>(ptr)); }),\
+		::omnity::create_vector_impl<TYPE_NAME>(),\
+		{});\
+	return meta;\
+}\
 
 namespace {
 	std::array<const omnity::type_metadata*, omnity::type_count> type_cache;

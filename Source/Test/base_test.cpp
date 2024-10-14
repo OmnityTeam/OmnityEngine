@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <graphic/graphic.h>
 #include <base/scene.h>
-#include <base/types.h>
+#include <base/type.h>
 #include <chrono>
 
 TEST(base, type_system) {

@@ -1,5 +1,5 @@
 #pragma once
-#include <base/object.h>
+#include <base/serialize.h>
 namespace omnity {
 	class text_asset {
 	public:

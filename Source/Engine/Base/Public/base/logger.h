@@ -1,11 +1,11 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include <base/types.h>
+#include <base/type.h>
 #include <fmt/format.h>
 
 namespace omnity {
-    class log_sink : noncopyable {
+    class log_sink {
     public:
         log_sink() = default;
         virtual void log(std::u16string_view category, std::u16string_view message) = 0;

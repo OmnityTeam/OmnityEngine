@@ -22,18 +22,18 @@ namespace omnity {
         }
         inline std::u16string from_wide_ptr(const wchar_t* str, size_t len) {
             if constexpr (sizeof(wchar_t) == sizeof(char16_t))
-                return std::u16string(reinterpret_cast<const char16_t*>(str));
+				return { reinterpret_cast<const char16_t*>(str) };
             if constexpr (sizeof(wchar_t) == sizeof(char32_t))
                 return from_utf32_ptr(reinterpret_cast<const char32_t*>(str), len);
         }
         inline std::u16string from_wide_ptr(const wchar_t* str) {
             if constexpr (sizeof(wchar_t) == sizeof(char16_t))
-                return std::u16string(reinterpret_cast<const char16_t*>(str));
+                return { reinterpret_cast<const char16_t*>(str) };
             if constexpr (sizeof(wchar_t) == sizeof(char32_t))
                 return from_utf32_ptr(reinterpret_cast<const char32_t*>(str), std::char_traits<wchar_t>::length(str));
         }
-        std::u16string from_utf8(const std::string& str);
-        std::string to_utf8(const std::u16string& str);
+        std::u16string from_utf8(const std::string_view& str);
+		std::string to_utf8(const std::u16string_view& str);
         char32_t next_char(std::u16string_view::const_iterator& iter, std::u16string_view::const_iterator end);
         char32_t next_char(std::u16string::const_iterator& iter, std::u16string::const_iterator end);
     }

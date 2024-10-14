@@ -1,5 +1,5 @@
 #pragma once
-#include <base/types.h>
+#include <base/type.h>
 #include <filesystem>
 #include <resources/resources.h>
 #include <resource_importers/importers.h>

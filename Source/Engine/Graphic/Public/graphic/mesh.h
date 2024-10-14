@@ -1,5 +1,5 @@
 #pragma once
-#include <base/types.h>
+#include <base/serialize.h>
 
 namespace omnity {
 	class mesh {

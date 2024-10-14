@@ -4,7 +4,7 @@
 #include <memory>
 #include <any>
 #include <atomic>
-#include <base/types.h>
+#include <base/type.h>
 #include <fstream>
 
 namespace omnity {

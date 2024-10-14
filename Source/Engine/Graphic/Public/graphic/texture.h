@@ -1,5 +1,6 @@
 #pragma once
-#include <base/types.h>
+#include <base/serialize.h>
+#include <base/serialized_basic_types.h>
 
 namespace omnity {
 	class texture {
@@ -7,24 +8,16 @@ namespace omnity {
 		METADATA_BEGIN(texture)
 			FIELD(w_)
 			FIELD(h_)
+			FIELD(data_)
 		METADATA_END()
 	private:
 		uint32_t w_, h_;
+		binary_block_t data_;
 	public:
 		texture() = default;
 		texture(uint32_t w, uint32_t h) : w_(w), h_(h) {}
-		template <class Archive>
-		void save(Archive& ar) const
-		{
-			ar& w_;
-			ar& h_;
-		}
-
-		template <class Archive>
-		void load(Archive& ar)
-		{
-			ar& w_;
-			ar& h_;
+		void set_data(const std::vector<uint8_t>& data) {
+			data_ = data;
 		}
 	};
 }

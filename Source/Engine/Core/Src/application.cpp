@@ -1,4 +1,4 @@
-#include <base/types.h>
+#include <base/type.h>
 #include <vector>
 #include <core/core.h>
 #include <graphic/graphic.h>
@@ -21,6 +21,9 @@ namespace omnity::core {
             logger::log_info(arg);
         omnity::graphic::init_graphic();
         omnity::graphic::setup_graphic_backend();
+		auto ctx = get_debug_serializer_ctx();
+		texture tex(1,2);
+		serialize(ctx, tex);
     }
     void application::run(const int argc, const char* argv[]) {
         std::vector<std::u16string> args;

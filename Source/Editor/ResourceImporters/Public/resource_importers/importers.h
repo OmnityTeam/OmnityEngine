@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include <base/object.h>
+#include <base/type.h>
 #include <resources/resources.h>
 
 namespace omnity {
