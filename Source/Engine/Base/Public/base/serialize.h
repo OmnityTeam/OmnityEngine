@@ -2,29 +2,40 @@
 #include <string>
 #include <base/type_metadata.h>
 #include <base/type.h>
+#include <numeric>
+#include <source_location>
 
 #define METADATA_BEGIN(TYPE_NAME)\
 static const ::omnity::type_metadata& GET_METADATA_FUNC_NAME() {\
 	using __this_type = TYPE_NAME;\
-	static_assert(type_id<__this_type> != std::numeric_limits<type_id_t>::max(), "Type is not registered in object.h");\
-	[[maybe_unused]] field_id_t field_index = 0;\
-	static ::omnity::type_metadata meta(u""#TYPE_NAME, ::omnity::type_index<__this_type>, ::omnity::type_id<__this_type>, \
-	::omnity::serializer_t(\
-		[](serialize_ctx* ctx, void* ptr) { ::omnity::serialize<TYPE_NAME>(*ctx, *reinterpret_cast<TYPE_NAME*>(ptr)); }), \
-	::omnity::create_vector_impl<TYPE_NAME>(),\
-		{
+	constexpr std::u16string_view __type_name = u""#TYPE_NAME;\
+	omnity::field_id_t __field_count = 0;\
+	const omnity::field_metadata __fields[]{
 
 #define FIELD(FIELD_NAME) \
-{::omnity::field_metadata(\
+::omnity::field_metadata{\
 	u""#FIELD_NAME,\
-	field_index++,\
+	__field_count++,\
 	get_field_type_id<decltype(__this_type::FIELD_NAME)>(),\
 	get_field_type_index<decltype(__this_type::FIELD_NAME)>(),\
 	::omnity::is_array_v<decltype(__this_type::FIELD_NAME)>,\
-	offsetof(__this_type, FIELD_NAME))},
+	offsetof(__this_type, FIELD_NAME)},
 
 #define METADATA_END() \
-}); return meta; }
+::omnity::field_metadata{\
+	u"<NONE>",\
+	std::numeric_limits<::omnity::field_id_t>::max(),\
+	std::numeric_limits<::omnity::type_id_t>::max(),\
+	std::numeric_limits<size_t>::max(),\
+	false,\
+	0}\
+};\
+static ::omnity::type_metadata meta(__type_name, ::omnity::type_index<__this_type>, ::omnity::type_id<__this_type>, \
+	::omnity::serializer_t(\
+		[](serialize_ctx* ctx, void* ptr) { ::omnity::serialize<__this_type>(*ctx, *reinterpret_cast<__this_type*>(ptr)); }), \
+	::omnity::create_vector_impl<__this_type>(),\
+	__fields, __field_count); \
+return meta; }
 
 namespace omnity {
 	template<typename T>

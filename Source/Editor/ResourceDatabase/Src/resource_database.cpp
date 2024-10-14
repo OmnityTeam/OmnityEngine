@@ -4,7 +4,7 @@
 namespace omnity {
 	static void export_resource_package(const importer_context& ctx, std::basic_ostream<char>& os) {
 		for (const auto& val : ctx.get_cache() | std::views::values) {
-			const auto type_info = get_type_table()->try_get_type_metadata_by_id(val.type_id);
+			const auto type_info = type_table_instance.try_get_type_metadata_by_id(val.type_id);
 			for (auto field : type_info->get_fields()) {
 				[[maybe_unused]] auto field_type_meta = field.get_type_metadata();
 				os.write((char*)&field.name[0], field.name.size() * 2);

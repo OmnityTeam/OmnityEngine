@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <ranges>
+#include <cassert>
 #include <base/type_metadata.h>
 
 #define GET_METADATA_FUNC_NAME get_metadata
@@ -40,17 +41,17 @@ const type_metadata& GET_METADATA_GLOBAL_FUNC_NAME(TYPE_NAME)() {\
 namespace omnity {
 	// Type definitions
 	template <typename T>
-	constexpr inline type_id_t type_id = []() constexpr { static_assert("Unknown type"); return std::numeric_limits<type_id_t>::max(); };
+	constexpr inline type_id_t type_id = []() constexpr { static_assert(false, "Unknown type"); };
 	template <typename T>
-	constexpr inline size_t type_index = []() constexpr { static_assert("Unknown type"); return std::numeric_limits<size_t>::max(); };
+	constexpr inline size_t type_index = []() constexpr { static_assert(false, "Unknown type"); };
 	template <typename T>
 	inline const type_metadata* type_metadata_ptr = nullptr;
 	template <size_t Index>
-	constexpr inline type_id_t type_id_by_index = []() constexpr { static_assert("Unknown type"); return std::numeric_limits<type_id_t>::max(); };
+	constexpr inline type_id_t type_id_by_index = []() constexpr { static_assert(false, "Unknown type"); };
 	template <size_t Index>
 	inline const type_metadata* type_metadata_ptr_by_index = nullptr;
 	template <type_id_t Id>
-	constexpr inline size_t type_index_by_id = []() constexpr { static_assert("Unknown type"); return std::numeric_limits<size_t>::max(); };
+	constexpr inline size_t type_index_by_id = []() constexpr { static_assert(false, "Unknown type"); };
 	template <type_id_t Id>
 	inline const type_metadata* type_metadata_ptr_by_id = nullptr;
 	template <uint_least32_t Line>
@@ -94,20 +95,28 @@ namespace omnity {
 	// Type table
 	class type_table {
 	public:
+		using type_cache_t = std::array<const type_metadata*, type_count>;
+		using type_map_t = std::unordered_map<type_id_t, size_t>;
+	private:
+		type_cache_t type_cache_;
+		type_map_t type_map_;
+	public:
 		type_table();
 		template<typename T>
 		constexpr const type_metadata* get_type_metadata() const {
 			return get_type_metadata_by_index(type_index<T>);
 		}
-		const type_metadata* try_get_type_metadata_by_id(type_id_t type_id) const;
-		const type_metadata* get_type_metadata_by_index(size_t type_index) const;
+		constexpr const type_metadata* get_type_metadata_by_index(size_t type_index) const {
+			return type_cache_[type_index];
+		}
+		const type_metadata* try_get_type_metadata_by_id(type_id_t type_id) const {
+			const auto ret = type_map_.find(type_id);
+			assert(ret != type_map_.end());
+			return type_cache_[ret->second];
+		}
 	};
-	inline const type_table* get_type_table() {
-		static type_table type_table;
-		return &type_table;
-	}
-
+	extern const type_table type_table_instance;
 	inline const type_metadata* field_metadata::get_type_metadata() const {
-		return get_type_table()->get_type_metadata_by_index(field_type_index);
+		return type_table_instance.get_type_metadata_by_index(field_type_index);
 	}
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <assert.h>
 #include <vector>
 #include <map>
 #include <unordered_map>
@@ -10,7 +11,7 @@ namespace omnity {
 	using serializer_serialize_f = void(*)(serialize_ctx* ctx, void* ptr);
 	struct serializer_t {
 		serializer_serialize_f serialize;
-		serializer_t(serializer_serialize_f s) : serialize(s) {}
+		explicit constexpr serializer_t(serializer_serialize_f s) : serialize(s) {}
 	};
 	using vector_get_element = void*(*)(void* ptr, size_t i);
 	using vector_get_size = size_t(*)(void* ptr);
@@ -61,9 +62,9 @@ namespace omnity {
 		const size_t field_type_index;
 		const size_t offset;
 		const bool is_array;
-		constexpr field_metadata(const std::u16string_view n, const field_id_t id, const type_id_t type_id, const type_id_t type_index, const bool is_array, const size_t off)
+		constexpr field_metadata(const std::u16string_view n, const field_id_t id, const type_id_t type_id, const size_t type_index, const bool is_array, const size_t off)
 			: name(n), field_id(id), field_type_id(type_id), field_type_index(type_index), offset(off), is_array(is_array) {}
-		const type_metadata* get_type_metadata() const;
+		[[nodiscard]] const type_metadata* get_type_metadata() const;
 	};
 	class type_metadata {
 		const std::vector<field_metadata> fields_;
@@ -74,8 +75,8 @@ namespace omnity {
 		const type_id_t type_id;
 		const serializer_t serializer;
 		const vector_impl_t vector_impl;
-		type_metadata(const std::u16string_view n, const size_t type_index, const type_id_t id, const serializer_t& s, const vector_impl_t& vector_impl, const std::initializer_list<field_metadata> f)
-			: fields_(f), name(n), runtime_type_index(type_index), type_id(id), serializer(s), vector_impl(vector_impl) {
+		type_metadata(const std::u16string_view n, const size_t type_index, const type_id_t id, const serializer_t& s, const vector_impl_t& vector_impl, const field_metadata* field_array, const size_t field_count)
+			: fields_(field_array, field_array + field_count), name(n), runtime_type_index(type_index), type_id(id), serializer(s), vector_impl(vector_impl) {
 			auto kvp = std::views::transform(
 				fields_,
 				[](const field_metadata& meta) { return std::make_pair(meta.name, meta.field_id); });
@@ -86,10 +87,10 @@ namespace omnity {
 		}
 		const field_metadata* try_get_field(const std::u16string_view field_name) const {
 			const auto ret = field_map_.find(field_name);
-			if (ret == field_map_.end()) return nullptr;
+			assert(ret != field_map_.end());
 			return &fields_[ret->second];
 		}
-		const std::vector<field_metadata>& get_fields() const {
+		[[nodiscard]] const std::vector<field_metadata>& get_fields() const {
 			return fields_;
 		}
 	};

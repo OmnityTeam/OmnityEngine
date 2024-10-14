@@ -4,6 +4,7 @@
 #include <base/string_utils.h>
 
 TEST(resource, serialize) {
+	constexpr omnity::field_metadata fields[]{ omnity::field_metadata{u"123",0,0, 0,false, 0} };
 	omnity::texture tex(1, 2);
 	tex.set_data({ 1,2,3,4 });
 	omnity::serialize_ctx ctx;
