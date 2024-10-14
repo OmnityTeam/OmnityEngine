@@ -4,18 +4,17 @@
 #include <base/type.h>
 #include <numeric>
 #include <source_location>
+#include <array>
 
 #define METADATA_BEGIN(TYPE_NAME)\
 static const ::omnity::type_metadata& GET_METADATA_FUNC_NAME() {\
 	using __this_type = TYPE_NAME;\
 	constexpr std::u16string_view __type_name = u""#TYPE_NAME;\
-	[[maybe_unused]] omnity::field_id_t __field_count = 0;\
-	const omnity::field_metadata __fields[]{
+	constexpr std::array __fields{
 
 #define FIELD(FIELD_NAME) \
 ::omnity::field_metadata{\
 	u""#FIELD_NAME,\
-	__field_count++,\
 	get_field_type_id<decltype(__this_type::FIELD_NAME)>(),\
 	get_field_type_index<decltype(__this_type::FIELD_NAME)>(),\
 	::omnity::is_array_v<decltype(__this_type::FIELD_NAME)>,\
@@ -24,7 +23,6 @@ static const ::omnity::type_metadata& GET_METADATA_FUNC_NAME() {\
 #define METADATA_END() \
 ::omnity::field_metadata{\
 	u"<NONE>",\
-	std::numeric_limits<::omnity::field_id_t>::max(),\
 	std::numeric_limits<::omnity::type_id_t>::max(),\
 	std::numeric_limits<size_t>::max(),\
 	false,\
@@ -34,7 +32,7 @@ static ::omnity::type_metadata meta(__type_name, ::omnity::type_index<__this_typ
 	::omnity::serializer_t(\
 		[](serialize_ctx* ctx, void* ptr) { ::omnity::serialize<__this_type>(*ctx, *reinterpret_cast<__this_type*>(ptr)); }), \
 	::omnity::create_vector_impl<__this_type>(),\
-	std::initializer_list(std::begin(__fields), std::end(__fields)-1)); \
+	[](void* ctx, ::omnity::type_metadata::field_foreach_action_t action){ for (::omnity::field_id_t i=0;i<__fields.size()-1;++i) action(ctx, i, __fields[i]); }); \
 return meta; }
 
 namespace omnity {
@@ -95,23 +93,29 @@ namespace omnity {
 	serialize_ctx get_debug_serializer_ctx();
 	inline void default_object_serialize(serialize_ctx& ctx, const type_metadata* type_meta, void* ptr) {
 		ctx.begin_object();
-		for (auto& field : type_meta->get_fields()) {
-			ctx.set_key(field.name);
-			void* field_value_ptr = static_cast<char*>(ptr) + field.offset;
-			if (field.is_array) {
-				auto& vector_impl = field.get_type_metadata()->vector_impl;
-				auto size = vector_impl.get_size(field_value_ptr);
-				ctx.begin_array(size);
-				for (size_t i=0;i<size;++i) {
-					auto elem = vector_impl.get_element(field_value_ptr, i);
-					field.get_type_metadata()->serializer.serialize(&ctx, elem);
+		struct ctx_t {
+			serialize_ctx& c;
+			void* p;
+			ctx_t(serialize_ctx& c, void* p) : c(c), p(p) {}
+		};
+		ctx_t foreach_ctx(ctx, ptr);
+		type_meta->fields_foreach<ctx_t&>(foreach_ctx, [](ctx_t& ctx, field_id_t, field_metadata field) {
+				ctx.c.set_key(field.name);
+				void* field_value_ptr = static_cast<char*>(ctx.p) + field.offset;
+				if (field.is_array) {
+					auto& vector_impl = field.get_type_metadata()->vector_impl;
+					auto size = vector_impl.get_size(field_value_ptr);
+					ctx.c.begin_array(size);
+					for (size_t i = 0; i < size; ++i) {
+						auto elem = vector_impl.get_element(field_value_ptr, i);
+						field.get_type_metadata()->serializer.serialize(&ctx.c, elem);
+					}
+					ctx.c.end_array();
 				}
-				ctx.end_array();
-			}
-			else {
-				field.get_type_metadata()->serializer.serialize(&ctx, field_value_ptr);
-			}
-		}
+				else {
+					field.get_type_metadata()->serializer.serialize(&ctx.c, field_value_ptr);
+				}
+			});
 		ctx.end_object();
 	}
 	template <typename T>

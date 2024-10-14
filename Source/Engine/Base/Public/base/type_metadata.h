@@ -57,30 +57,33 @@ namespace omnity {
 		friend class type_metadata;
 	public:
 		const std::u16string_view name;
-		const field_id_t field_id;
 		const type_id_t field_type_id;
 		const size_t field_type_index;
 		const size_t offset;
 		const bool is_array;
-		constexpr field_metadata(const std::u16string_view n, const field_id_t id, const type_id_t type_id, const size_t type_index, const bool is_array, const size_t off)
-			: name(n), field_id(id), field_type_id(type_id), field_type_index(type_index), offset(off), is_array(is_array) {}
+		constexpr field_metadata(const std::u16string_view n, const type_id_t type_id, const size_t type_index, const bool is_array, const size_t off)
+			: name(n), field_type_id(type_id), field_type_index(type_index), offset(off), is_array(is_array) {}
 		[[nodiscard]] const type_metadata* get_type_metadata() const;
 	};
 	class type_metadata {
-		const std::vector<field_metadata> fields_;
+		std::vector<field_metadata> fields_;
 		std::map<std::u16string_view, field_id_t> field_map_;
 	public:
+		using field_foreach_action_t = void(*)(void* ctx, field_id_t i, field_metadata meta);
+		using field_foreach_f = void(*)(void* ctx, field_foreach_action_t action);
 		const std::u16string_view name;
 		const size_t runtime_type_index;
 		const type_id_t type_id;
 		const serializer_t serializer;
 		const vector_impl_t vector_impl;
-		type_metadata(const std::u16string_view n, const size_t type_index, const type_id_t id, const serializer_t& s, const vector_impl_t& vector_impl, const std::initializer_list<field_metadata> f)
-			: fields_(f), name(n), runtime_type_index(type_index), type_id(id), serializer(s), vector_impl(vector_impl) {
-			auto kvp = std::views::transform(
-				fields_,
-				[](const field_metadata& meta) { return std::make_pair(meta.name, meta.field_id); });
-			field_map_ = std::map(kvp.begin(), kvp.end());
+		field_foreach_f foreach;
+		type_metadata(const std::u16string_view n, const size_t type_index, const type_id_t id, const serializer_t& s, const vector_impl_t& vector_impl, field_foreach_f field_foreach)
+			: name(n), runtime_type_index(type_index), type_id(id), serializer(s), vector_impl(vector_impl), foreach(field_foreach) {
+			if (foreach != nullptr)
+				foreach(this, [](void* ctx, field_id_t i, field_metadata meta) {
+					static_cast<type_metadata*>(ctx)->fields_.emplace_back(meta);
+					static_cast<type_metadata*>(ctx)->field_map_[meta.name] = i;
+				});
 		}
 		const field_metadata* get_field(const field_id_t field_id) const {
 			return &fields_[field_id];
@@ -90,8 +93,23 @@ namespace omnity {
 			assert(ret != field_map_.end());
 			return &fields_[ret->second];
 		}
-		[[nodiscard]] const std::vector<field_metadata>& get_fields() const {
+		const std::vector<field_metadata>& get_fields() const {
 			return fields_;
+		}
+		template<typename Capture>
+		void fields_foreach(Capture cap, void(*action)(Capture cap, field_id_t i, field_metadata meta)) const {
+			using specialize_action = void(*)(Capture, field_id_t, field_metadata);
+			struct ctx_t {
+				Capture c;
+				specialize_action act;
+				ctx_t(Capture c, specialize_action act) : c(c), act(act) {}
+			};
+			ctx_t ctx(cap, action);
+			if (foreach == nullptr) return;
+			foreach(&ctx, [](void* ctx, field_id_t i, field_metadata meta)
+				{
+					static_cast<ctx_t*>(ctx)->act(static_cast<ctx_t*>(ctx)->c, i, meta);
+				});
 		}
 	};
 }
